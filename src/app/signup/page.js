@@ -17,7 +17,7 @@ export default function SignupPage() {
     setLoading(true); // Start loading
 
     try {
-      const response = await axios.post("http://localhost:8000/api/auth/signup", {
+      const response = await axios.post("https://the-blog-zone-server.vercel.app/api/auth/signup", {
         username,
         name,
         password,
