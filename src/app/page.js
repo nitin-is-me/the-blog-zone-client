@@ -3,10 +3,18 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // to navigate after actions
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState({
+    login: false,
+    signup: false,
+    dashboard: false
+  });
+
+  const router = useRouter();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -32,6 +40,21 @@ export default function Home() {
     checkAuth();
   }, []);
 
+  const handleLoginClick = () => {
+    setButtonLoading({ ...buttonLoading, login: true });
+    router.push("/login");
+  };
+
+  const handleSignupClick = () => {
+    setButtonLoading({ ...buttonLoading, signup: true });
+    router.push("/signup");
+  };
+
+  const handleDashboardClick = () => {
+    setButtonLoading({ ...buttonLoading, dashboard: true });
+    router.push("/dashboard");
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gradient-to-b from-blue-100 to-blue-300">
@@ -51,26 +74,41 @@ export default function Home() {
           Explore the world of ideas and share your own with our blogging platform.
         </p>
         {isAuthenticated ? (
-          <Link
-            href="/dashboard"
-            className="block bg-blue-500 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+          <button
+            disabled={buttonLoading.dashboard}
+            onClick={handleDashboardClick}
+            className="block bg-blue-500 mx-auto text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
           >
-            Go to Dashboard
-          </Link>
+            {buttonLoading.dashboard ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-blue-500 border-opacity-70"></div>
+            ) : (
+              "Go to Dashboard"
+            )}
+          </button>
         ) : (
           <div className="flex justify-center gap-4">
-            <Link
-              href="/login"
-              className="bg-green-500 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition duration-200"
+            <button
+              disabled={buttonLoading.login}
+              onClick={handleLoginClick}
+              className="flex items-center justify-center gap-2 bg-green-500 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-green-600 transition duration-200"
             >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-blue-500 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
+              {buttonLoading.login ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-blue-500 border-opacity-70"></div>
+              ) : (
+                "Login"
+              )}
+            </button>
+            <button
+              disabled={buttonLoading.signup}
+              onClick={handleSignupClick}
+              className="flex items-center justify-center gap-2 bg-blue-500 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
             >
-              Sign Up
-            </Link>
+              {buttonLoading.signup ? (
+                <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-blue-500 border-opacity-70"></div>
+              ) : (
+                "Sign Up"
+              )}
+            </button>
           </div>
         )}
       </div>

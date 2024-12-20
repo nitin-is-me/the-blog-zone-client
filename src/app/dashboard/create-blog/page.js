@@ -11,11 +11,15 @@ export default function CreateBlogPage() {
   const [success, setSuccess] = useState('');
   const router = useRouter();
 
+  const handleBack = () => {
+    router.back(); // Navigate back to the previous page
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem('token'); 
+      const token = localStorage.getItem('token');
       if (!token) {
         setError('You must be logged in to create a post.');
         return;
@@ -26,7 +30,7 @@ export default function CreateBlogPage() {
         { title, content },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // attaching token cuz the api requires it
+            Authorization: `Bearer ${token}`, // attaching token cuz the API requires it
           },
         }
       );
@@ -43,7 +47,15 @@ export default function CreateBlogPage() {
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-16">
-      <h2 className="text-2xl font-bold mb-6">Create a New Blog Post</h2>
+      <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={handleBack}
+          className="bg-gray-200 text-gray-800 px-4 py-2 rounded shadow-lg hover:bg-gray-300 transition duration-200"
+        >
+          Back
+        </button>
+        <h2 className="text-2xl font-bold">Create a New Blog Post</h2>
+      </div>
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
       {success && <p className="text-green-500 mb-4">{success}</p>}

@@ -9,10 +9,12 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading
   const router = useRouter();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true); // Start loading
 
     try {
       const response = await axios.post("https://the-blog-zone-server.vercel.app/api/auth/signup", {
@@ -20,14 +22,16 @@ export default function SignupPage() {
         name,
         password,
       });
+
       if (response.status === 201 && response.data.token) {
-        // If signup is successful, redirect to dashboard page
-        router.push("/dashboard");
+        router.push("/dashboard"); // Redirect on success
       } else {
         setError("Error signing up. Please try again.");
       }
     } catch (error) {
       setError(error.response?.data || "An error occurred. Please try again.");
+    } finally {
+      setLoading(false); // Stop loading
     }
   };
 
@@ -66,13 +70,44 @@ export default function SignupPage() {
             required
           />
         </div>
-        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
-          Sign Up
+        <button
+          type="submit"
+          className={`w-full flex justify-center items-center bg-blue-500 text-white p-2 rounded ${
+            loading ? "opacity-70" : "hover:bg-blue-600"
+          }`}
+          disabled={loading}
+        >
+          {loading ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v8H4z"
+              ></path>
+            </svg>
+          ) : (
+            "Sign Up"
+          )}
         </button>
       </form>
       <p className="mt-4 text-center">
         Already have an account?{" "}
-        <Link href="/login" className="text-blue-500 hover:text-blue-700">Login</Link>
+        <Link href="/login" className="text-blue-500 hover:text-blue-700">
+          Login
+        </Link>
       </p>
     </div>
   );

@@ -1,14 +1,16 @@
-'use client';
+"use client"
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { formatTimeAgo } from "../utils/formatTime";
 
 export default function Dashboard() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,7 +23,7 @@ export default function Dashboard() {
               Authorization: `Bearer ${token}`,
             },
           });
-          setCurrentUser(response.data); // Assuming the server returns user details
+          setCurrentUser(response.data); // the server returns user details
         } catch (error) {
           console.error("Failed to fetch user info:", error);
         }
@@ -58,9 +60,11 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    router.push("/");
+  const handleLogout = async () => {
+      setLogoutLoading(true); // Start loading spinner
+      localStorage.removeItem("token");
+      router.push("/");
+      // no need to stop spinner, cuz we're sending the user to the main page already
   };
 
   if (loading) {
@@ -80,9 +84,14 @@ export default function Dashboard() {
         <h1 className="text-3xl font-semibold">The Blog Zone</h1>
         <button
           onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded shadow-lg hover:bg-red-600 transition duration-200"
+          className="bg-red-500 text-white px-4 py-2 rounded shadow-lg hover:bg-red-600 transition duration-200 flex items-center justify-center"
+          disabled={logoutLoading} // Disable the button while loading
         >
-          Logout
+          {logoutLoading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+          ) : (
+            "Logout"
+          )}
         </button>
       </div>
 
@@ -93,14 +102,16 @@ export default function Dashboard() {
           <div key={post._id} className="bg-white p-6 rounded-lg shadow-lg relative">
             <h2 className="text-xl font-bold mb-4">{post.title}</h2>
             <p className="text-gray-600 mb-4">{post.content.substring(0, 100)}...</p>
-            <p className="text-sm text-gray-400">By {post.author.name}</p>
+            <p className="text-sm text-gray-500">By {post.author.name}</p>
+            <p className="text-xs text-gray-400 mt-2">
+              {formatTimeAgo(post.createdAt)}
+            </p>
             <Link
               href={`/dashboard/${post._id}`}
               className="text-blue-500 hover:text-blue-700 mt-4 inline-block"
             >
               Read More
             </Link>
-            {/* check if the post author's username matches the logged in user */}
             {currentUser?.username === post.author.username && (
               <button
                 onClick={() => handleDelete(post._id)}
