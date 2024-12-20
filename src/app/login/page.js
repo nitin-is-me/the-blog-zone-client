@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true); // Start loading
 
     try {
-      const response = await axios.post("https://the-blog-zone-server.vercel.app/api/auth/login", { username, password });
+      const response = await axios.post("http://localhost:8000/api/auth/login", { username, password });
 
       const data = await response.data;
       console.log(data);

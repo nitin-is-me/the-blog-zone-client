@@ -22,7 +22,7 @@ export default function BlogPostPage() {
 
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/blog/${id}`);
         setPost(response.data);
         setComments(response.data.comments || []);
       } catch (error) {
@@ -37,7 +37,7 @@ export default function BlogPostPage() {
       const token = localStorage.getItem("token");
       if (token) {
         try {
-          const response = await axios.get("https://the-blog-zone-server.vercel.app/api/auth/me", {
+          const response = await axios.get("http://localhost:8000/api/auth/me", {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -71,7 +71,7 @@ export default function BlogPostPage() {
     try {
       const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
       const response = await axios.post(
-        `https://the-blog-zone-server.vercel.app/api/blog/${id}/comments`,
+        `http://localhost:8000/api/blog/${id}/comments`,
         { content: newComment },
         {
           headers: {
@@ -79,7 +79,7 @@ export default function BlogPostPage() {
           },
         }
       );
-      const commentResponse = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
+      const commentResponse = await axios.get(`http://localhost:8000/api/blog/${id}`);
       setComments(commentResponse.data.comments);
       setNewComment(""); // Reset comment input
     } catch (error) {
@@ -96,7 +96,7 @@ export default function BlogPostPage() {
       const token = localStorage.getItem("token");
 
       // Send DELETE request to the backend to delete the comment
-      await axios.delete(`https://the-blog-zone-server.vercel.app/api/blog/comment/${commentId}`, {
+      await axios.delete(`http://localhost:8000/api/blog/comment/${commentId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

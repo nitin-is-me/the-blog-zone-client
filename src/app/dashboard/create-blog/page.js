@@ -29,7 +29,7 @@ export default function CreateBlogPage() {
       setIsSubmitting(true); // Set submitting state to true
 
       const response = await axios.post(
-        'https://the-blog-zone-server.vercel.app/api/blog/create',
+        'http://localhost:8000/api/blog/create',
         { title, content },
         {
           headers: {
