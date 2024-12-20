@@ -13,6 +13,7 @@ export default function BlogPostPage() {
   const [commentError, setCommentError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null); // state for logged-in user
+  const [deletingCommentId, setDeletingCommentId] = useState(null); // state to track deleting comment
   const router = useRouter();
   const { id } = useParams();
 
@@ -80,7 +81,6 @@ export default function BlogPostPage() {
       );
       const commentResponse = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
       setComments(commentResponse.data.comments);
-      // setComments((prev) => [...prev, response.data]); // Add new comment to the list
       setNewComment(""); // Reset comment input
     } catch (error) {
       setCommentError("Failed to submit comment. Please try again.");
@@ -90,6 +90,8 @@ export default function BlogPostPage() {
   };
 
   const handleDeleteComment = async (commentId) => {
+    setDeletingCommentId(commentId); // Set the comment as deleting
+
     try {
       const token = localStorage.getItem("token");
 
@@ -106,6 +108,8 @@ export default function BlogPostPage() {
       );
     } catch (error) {
       setError("Failed to delete the comment. Please try again.");
+    } finally {
+      setDeletingCommentId(null); // Reset deleting state
     }
   };
 
@@ -183,12 +187,12 @@ export default function BlogPostPage() {
                   <button
                     onClick={() => handleDeleteComment(comment._id)}
                     className="self-end mt-2 text-red-500 hover:text-red-700"
+                    disabled={deletingCommentId === comment._id}
                   >
-                    Delete
+                    {deletingCommentId === comment._id ? "Deleting..." : "Delete"}
                   </button>
                 )}
               </div>
-
             ))
           ) : (
             <p className="text-gray-500">No comments yet. Be the first to comment!</p>
