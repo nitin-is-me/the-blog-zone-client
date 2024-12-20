@@ -24,6 +24,7 @@ export default function SignupPage() {
       });
 
       if (response.status === 201 && response.data.token) {
+        localStorage.setItem("token", response.data.token);
         router.push("/dashboard"); // Redirect on success
       } else {
         setError("Error signing up. Please try again.");
