@@ -1,18 +1,15 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { formatTimeAgo } from "../../utils/formatTime";
 import { useRouter } from "next/navigation";
-import { formatTimeAgo } from "../utils/formatTime";
-
-export default function Dashboard() {
+export default function PrivatePosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
-  const [logoutLoading, setLogoutLoading] = useState(false);
   const router = useRouter();
-
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const token = localStorage.getItem("token");
@@ -30,20 +27,29 @@ export default function Dashboard() {
       }
     };
 
-    const fetchPosts = async () => {
+    const fetchPrivatePosts = async () => {
+      const token = localStorage.getItem("token");
       try {
-        const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog");
+        const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog/blogs/private", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPosts(response.data);
       } catch (error) {
-        setError("Failed to fetch blog posts.");
+        setError("Failed to fetch private posts.");
       } finally {
         setLoading(false);
       }
     };
 
     fetchCurrentUser();
-    fetchPosts();
+    fetchPrivatePosts();
   }, []);
+
+  const handleBack = () => {
+    router.push("/dashboard"); // Navigate back to the previous page
+  };
 
   const handleDelete = async (postId) => {
     const token = localStorage.getItem("token");
@@ -60,19 +66,12 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-      setLogoutLoading(true); // Start loading spinner
-      localStorage.removeItem("token");
-      router.push("/");
-      // no need to stop spinner, cuz we're sending the user to the main page already
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-600">Loading posts...</p>
+          <p className="mt-4 text-gray-600">Loading private posts...</p>
         </div>
       </div>
     );
@@ -80,46 +79,33 @@ export default function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
+        <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={handleBack}
+          className="bg-gray-200 text-gray-800 px-4 py-2 rounded shadow-lg hover:bg-gray-300 transition duration-200"
+        >
+          Back
+        </button>
+      </div>
       <div className="flex justify-between items-center mb-6">
-  <h1 className="text-3xl font-semibold">The Blog Zone</h1>
-  <div className="flex gap-4">
-    <Link
-      href="/dashboard/private"
-      className="bg-green-500 text-white px-4 py-2 rounded shadow-lg hover:bg-green-600 transition duration-200"
-    >
-      Private Posts
-    </Link>
-    <button
-      onClick={handleLogout}
-      className="bg-red-500 text-white px-4 py-2 rounded shadow-lg hover:bg-red-600 transition duration-200 flex items-center justify-center"
-      disabled={logoutLoading} // Disable the button while loading
-    >
-      {logoutLoading ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
-      ) : (
-        "Logout"
-      )}
-    </button>
-  </div>
-</div>
-
+        <h1 className="text-3xl font-semibold">My Private Posts</h1>
+      </div>
       {error && <p className="text-red-500">{error}</p>}
-
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {posts.map((post) => (
           <div key={post._id} className="bg-white p-6 rounded-lg shadow-lg relative">
             <h2 className="text-xl font-bold mb-4">{post.title}</h2>
             <p className="text-gray-600 mb-4">{post.content.substring(0, 100)}...</p>
             <p className="text-sm text-gray-500">By {post.author.name}</p>
-            <p className="text-xs text-gray-400 mt-2">
-              {formatTimeAgo(post.createdAt)}
-            </p>
+            <p className="text-xs text-gray-400 mt-2">{formatTimeAgo(post.createdAt)}</p>
+
             <Link
-              href={`/dashboard/${post._id}`}
+              href={`/dashboard/private/${post._id}`}
               className="text-blue-500 hover:text-blue-700 mt-4 inline-block"
             >
               Read More
             </Link>
+
             {currentUser?.username === post.author.username && (
               <button
                 onClick={() => handleDelete(post._id)}
@@ -131,13 +117,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-
-      <Link
-        href="/dashboard/create-blog"
-        className="fixed bottom-6 right-6 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-200"
-      >
-        <span className="text-2xl">+</span>
-      </Link>
     </div>
   );
 }

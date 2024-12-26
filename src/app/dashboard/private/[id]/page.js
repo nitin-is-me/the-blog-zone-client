@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
-import { formatTimeAgo } from "../../utils/formatTime";
+import { formatTimeAgo } from "../../../utils/formatTime";
 
 export default function BlogPostPage() {
   const [post, setPost] = useState(null);
@@ -55,7 +55,7 @@ export default function BlogPostPage() {
 
   const handleBack = () => {
     // router.back(); // Navigate back to the previous page
-    router.push("/dashboard");
+    router.push("/dashboard/private");
   };
 
   const handleCommentSubmit = async (e) => {

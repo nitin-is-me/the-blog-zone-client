@@ -7,13 +7,15 @@ import { useRouter } from 'next/navigation';
 export default function CreateBlogPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
+  const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false); // Track the submission process
   const router = useRouter();
 
   const handleBack = () => {
-    router.back(); // Navigate back to the previous page
+    // router.back();
+    router.push("/dashboard"); // Navigate back to the previous page
   };
 
   const handleSubmit = async (e) => {
@@ -30,7 +32,7 @@ export default function CreateBlogPage() {
 
       const response = await axios.post(
         'https://the-blog-zone-server.vercel.app/api/blog/create',
-        { title, content },
+        { title, content, private: isPrivate },
         {
           headers: {
             Authorization: `Bearer ${token}`, // attaching token cuz the API requires it
@@ -86,6 +88,32 @@ export default function CreateBlogPage() {
             rows="5"
             required
           ></textarea>
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-sm font-medium mb-2">Privacy</label>
+          <div className="flex items-center space-x-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value={false}
+                checked={!isPrivate}
+                onChange={() => setIsPrivate(false)}
+                className="mr-2"
+              />
+              Public
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value={true}
+                checked={isPrivate}
+                onChange={() => setIsPrivate(true)}
+                className="mr-2"
+              />
+              Private
+            </label>
+          </div>
         </div>
 
         <button
