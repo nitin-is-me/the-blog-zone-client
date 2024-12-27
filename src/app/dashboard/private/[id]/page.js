@@ -54,7 +54,6 @@ export default function BlogPostPage() {
   }, [id]);
 
   const handleBack = () => {
-    // router.back(); // Navigate back to the previous page
     router.push("/dashboard/private");
   };
 
@@ -116,88 +115,88 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-600">Loading post...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-opacity-70"></div>
+          <p className="mt-4 text-gray-300">Loading post...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={handleBack}
-          className="bg-gray-200 text-gray-800 px-4 py-2 rounded shadow-lg hover:bg-gray-300 transition duration-200"
-        >
-          Back
-        </button>
-      </div>
-
-      {error && <p className="text-red-500">{error}</p>}
-
-      {post && (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h1 className="text-3xl font-bold mb-6">{post.title}</h1>
-          <p className="text-gray-600 mb-4 whitespace-pre-wrap">{post.content}</p>
-          <p className="text-sm text-gray-500">By {post.author.name}</p>
-          <p className="text-xs text-gray-400 mt-2">
-            {formatTimeAgo(post.createdAt)}
-          </p>
-        </div>
-      )}
-
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Comments</h2>
-
-        <form onSubmit={handleCommentSubmit} className="mb-6">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
-            rows="4"
-            placeholder="Write a comment..."
-          />
-          {commentError && <p className="text-red-500 text-sm">{commentError}</p>}
+    <div className="min-h-screen bg-gray-900 text-gray-300">
+      <div className="max-w-4xl mx-auto p-6 bg-gray-900">
+        <div className="flex justify-between items-center mb-6">
           <button
-            type="submit"
-            className="mt-2 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition duration-200"
-            disabled={isSubmitting}
+            onClick={handleBack}
+            className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
           >
-            {isSubmitting ? "Submitting..." : "Post Comment"}
+            Back
           </button>
-        </form>
+        </div>
 
-        {/* Display Comments */}
-        <div className="space-y-4">
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <div key={comment._id} className="p-4 border rounded-lg flex flex-col justify-between">
-                <div>
-                  <p className="text-gray-800">{comment.content}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    By {comment.author?.name || "anonymous"} &middot;{" "}
-                    {formatTimeAgo(comment.createdAt)}
-                  </p>
+        {error && <p className="text-red-500">{error}</p>}
+
+        {post && (
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
+            <h1 className="text-3xl font-bold text-gray-100 mb-6">{post.title}</h1>
+            <p className="text-gray-400 mb-4 whitespace-pre-wrap">{post.content}</p>
+            <p className="text-sm text-gray-500">By {post.author.name}</p>
+            <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+          </div>
+        )}
+
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold text-gray-100 mb-4">Comments</h2>
+
+          <form onSubmit={handleCommentSubmit} className="mb-6">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="bg-gray-900 text-gray-200 w-full p-3 border border-gray-700 rounded-lg focus:outline-none focus:ring focus:ring-indigo-500"
+              rows="4"
+              placeholder="Write a comment..."
+            />
+            {commentError && <p className="text-red-500 text-sm">{commentError}</p>}
+            <button
+              type="submit"
+              className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700 transition duration-200"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Post Comment"}
+            </button>
+          </form>
+
+          {/* Display Comments */}
+          <div className="space-y-4">
+            {comments.length > 0 ? (
+              comments.map((comment) => (
+                <div key={comment._id} className="p-4 rounded-lg bg-gray-800 flex flex-col justify-between">
+                  <div>
+                    <p className="text-gray-300">{comment.content}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      By {comment.author?.name || "anonymous"} &middot;{" "}
+                      {formatTimeAgo(comment.createdAt)}
+                    </p>
+                  </div>
+
+                  {/* Delete Button */}
+                  {loggedInUser?.username === comment.author?.username && (
+                    <button
+                      onClick={() => handleDeleteComment(comment._id)}
+                      className="self-end mt-2 text-red-500 hover:text-red-700"
+                      disabled={deletingCommentId === comment._id}
+                    >
+                      {deletingCommentId === comment._id ? "Deleting..." : "Delete"}
+                    </button>
+                  )}
                 </div>
-
-                {/* Delete Button */}
-                {loggedInUser?.username === comment.author?.username && (
-                  <button
-                    onClick={() => handleDeleteComment(comment._id)}
-                    className="self-end mt-2 text-red-500 hover:text-red-700"
-                    disabled={deletingCommentId === comment._id}
-                  >
-                    {deletingCommentId === comment._id ? "Deleting..." : "Delete"}
-                  </button>
-                )}
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No comments yet. Be the first to comment!</p>
-          )}
+              ))
+            ) : (
+              <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+            )}
+          </div>
         </div>
       </div>
     </div>

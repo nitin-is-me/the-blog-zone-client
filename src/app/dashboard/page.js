@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
@@ -61,80 +61,102 @@ export default function Dashboard() {
   };
 
   const handleLogout = async () => {
-      setLogoutLoading(true); // Start loading spinner
-      localStorage.removeItem("token");
-      router.push("/");
-      // no need to stop spinner, cuz we're sending the user to the main page already
+    setLogoutLoading(true);
+    localStorage.removeItem("token");
+    router.push("/");
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-100">
+      <div className="flex justify-center items-center min-h-screen bg-gray-900">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-600">Loading posts...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500"></div>
+          <p className="mt-4 text-gray-300 text-lg font-medium">Loading posts...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-  <h1 className="text-3xl font-semibold">The Blog Zone</h1>
-  <div className="flex gap-4">
-    <Link
-      href="/dashboard/private"
-      className="bg-green-500 text-white px-4 py-2 rounded shadow-lg hover:bg-green-600 transition duration-200"
-    >
-      Private Posts
-    </Link>
-    <button
-      onClick={handleLogout}
-      className="bg-red-500 text-white px-4 py-2 rounded shadow-lg hover:bg-red-600 transition duration-200 flex items-center justify-center"
-      disabled={logoutLoading} // Disable the button while loading
-    >
-      {logoutLoading ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
-      ) : (
-        "Logout"
-      )}
-    </button>
-  </div>
-</div>
-
-      {error && <p className="text-red-500">{error}</p>}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <div key={post._id} className="bg-white p-6 rounded-lg shadow-lg relative">
-            <h2 className="text-xl font-bold mb-4">{post.title}</h2>
-            <p className="text-gray-600 mb-4">{post.content.substring(0, 100)}...</p>
-            <p className="text-sm text-gray-500">By {post.author.name}</p>
-            <p className="text-xs text-gray-400 mt-2">
-              {formatTimeAgo(post.createdAt)}
-            </p>
-            <Link
-              href={`/dashboard/${post._id}`}
-              className="text-blue-500 hover:text-blue-700 mt-4 inline-block"
-            >
-              Read More
-            </Link>
-            {currentUser?.username === post.author.username && (
-              <button
-                onClick={() => handleDelete(post._id)}
-                className="absolute bottom-4 right-4 text-red-500 hover:text-red-700 transition duration-200"
-              >
-                Delete
-              </button>
+    <div className="min-h-screen bg-gray-900 text-gray-300">
+      {/* Top Navigation */}
+      <header className="bg-gray-800 py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-10">
+        <h1 className="text-2xl font-bold text-indigo-500">The Blog Zone</h1>
+        <div className="flex gap-4">
+          <Link
+            href="/dashboard/private"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-full shadow hover:bg-indigo-700 transition duration-200"
+          >
+            Private Posts
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-full shadow hover:bg-red-600 transition duration-200 flex items-center"
+            disabled={logoutLoading}
+          >
+            {logoutLoading ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+            ) : (
+              "Logout"
             )}
-          </div>
-        ))}
+          </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto p-6">
+        {/* Welcome Section */}
+        <section className="mb-8 text-center">
+          <h2 className="text-4xl font-bold text-gray-100">Welcome, {currentUser?.name || "Guest"}!</h2>
+          <p className="text-lg text-gray-400 mt-2">
+            Explore the latest blog posts or share your thoughts with the community.
+          </p>
+        </section>
+
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+
+        {/* Posts Grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {posts.map((post) => (
+    <div
+      key={post._id}
+      className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between"
+    >
+      {/* Post Content */}
+      <div>
+        <h3 className="text-2xl font-semibold text-gray-100 mb-3">{post.title}</h3>
+        <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
+        <p className="text-sm text-gray-500">
+          By {post.author.name}
+        </p>
+        <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+        <Link
+          href={`/dashboard/${post._id}`}
+          className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
+        >
+          Read More
+        </Link>
       </div>
 
+      {/* Delete Button */}
+      {currentUser?.username === post.author.username && (
+        <button
+          onClick={() => handleDelete(post._id)}
+          className="absolute bottom-4 right-4 text-red-500 shadow-md hover:text-red-400 transition duration-200"
+        >
+          Delete
+        </button>
+      )}
+    </div>
+  ))}
+</section>
+
+      </main>
+
+      {/* Floating Action Button */}
       <Link
         href="/dashboard/create-blog"
-        className="fixed bottom-6 right-6 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-200"
+        className="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition transform hover:scale-110"
       >
         <span className="text-2xl">+</span>
       </Link>

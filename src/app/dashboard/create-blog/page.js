@@ -14,7 +14,6 @@ export default function CreateBlogPage() {
   const router = useRouter();
 
   const handleBack = () => {
-    // router.back();
     router.push("/dashboard"); // Navigate back to the previous page
   };
 
@@ -35,16 +34,15 @@ export default function CreateBlogPage() {
         { title, content, private: isPrivate },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // attaching token cuz the API requires it
+            Authorization: `Bearer ${token}`, // attaching token because the API requires it
           },
         }
       );
 
-      // setSuccess('Blog post created successfully!');
       setTitle('');
       setContent('');
       setError('');
-      router.push('/dashboard') // Redirect after success
+      router.push('/dashboard'); // Redirect after success
     } catch (error) {
       setError('Failed to create blog post.');
       setIsSubmitting(false);
@@ -52,83 +50,84 @@ export default function CreateBlogPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-16 ">
-      <div className="flex justify-between items-center mb-6">
-        <button
-          onClick={handleBack}
-          className="bg-gray-200 text-gray-800 px-4 py-2 rounded shadow-lg hover:bg-gray-300 transition duration-200"
-        >
-          Back
-        </button>
-      </div>
-
-      <h2 className="text-2xl font-bold text-center mb-6">Create a New Blog Post</h2> {/* Center the header with margin below the button */}
-
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {success && <p className="text-green-500 mb-4">{success}</p>}
-
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-            required
-          />
+    <div className="min-h-screen bg-gray-900 text-gray-300">
+      <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
+        <div className="flex justify-between items-center mb-6">
+          <button
+            onClick={handleBack}
+            className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
+          >
+            Back
+          </button>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Content</label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded"
-            rows="5"
-            required
-          ></textarea>
-        </div>
+        <h2 className="text-2xl font-bold text-center mb-6">Create a New Blog Post</h2>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Privacy</label>
-          <div className="flex items-center space-x-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value={false}
-                checked={!isPrivate}
-                onChange={() => setIsPrivate(false)}
-                className="mr-2"
-              />
-              Public
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value={true}
-                checked={isPrivate}
-                onChange={() => setIsPrivate(true)}
-                className="mr-2"
-              />
-              Private
-            </label>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {success && <p className="text-green-500 mb-4">{success}</p>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Title</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
+              required
+            />
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded flex justify-center items-center"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white border-opacity-70"></div>
-          ) : (
-            "Create Post"
-          )}
-        </button>
-      </form>
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Content</label>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
+              rows="5"
+              required
+            ></textarea>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium mb-2">Privacy</label>
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  value={false}
+                  checked={!isPrivate}
+                  onChange={() => setIsPrivate(false)}
+                  className="mr-2"
+                />
+                Public
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="radio"
+                  value={true}
+                  checked={isPrivate}
+                  onChange={() => setIsPrivate(true)}
+                  className="mr-2"
+                />
+                Private
+              </label>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-indigo-600 text-white p-2 rounded flex justify-center items-center hover:bg-indigo-700 transition duration-200"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white border-opacity-70"></div>
+            ) : (
+              "Create Post"
+            )}
+          </button>
+        </form>
+      </div>
     </div>
-
   );
 }
