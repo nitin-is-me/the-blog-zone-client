@@ -80,22 +80,22 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-300">
       {/* Top Navigation */}
-      <header className="bg-gray-800 py-4 px-6 flex justify-between items-center shadow-md sticky top-0 z-10">
-        <h1 className="text-2xl font-bold text-indigo-500">The Blog Zone</h1>
-        <div className="flex gap-4">
+      <header className="bg-gray-800 py-2 px-4 flex justify-between items-center shadow-md sticky top-0 z-10">
+        <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">The Blog Zone</h1>
+        <div className="flex gap-2 sm:gap-4">
           <Link
             href="/dashboard/private"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-full shadow hover:bg-indigo-700 transition duration-200"
+            className="text-sm bg-indigo-600 px-3 py-1.5 rounded-full shadow hover:bg-indigo-700 transition duration-200"
           >
             Private Posts
           </Link>
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded-full shadow hover:bg-red-600 transition duration-200 flex items-center"
+            className="text-sm bg-red-500 px-3 py-1.5 rounded-full shadow hover:bg-red-600 transition duration-200 flex items-center"
             disabled={logoutLoading}
           >
             {logoutLoading ? (
-              <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
+              <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
             ) : (
               "Logout"
             )}
@@ -103,11 +103,14 @@ export default function Dashboard() {
         </div>
       </header>
 
+
+
+
       {/* Main Content */}
       <main className="max-w-6xl mx-auto p-6">
         {/* Welcome Section */}
         <section className="mb-8 text-center">
-          <h2 className="text-4xl font-bold text-gray-100">Welcome, {currentUser?.name || "Guest"}!</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-100">Welcome, {currentUser?.name || "Guest"}!</h2>
           <p className="text-lg text-gray-400 mt-2">
             Explore the latest blog posts or share your thoughts with the community.
           </p>
@@ -117,39 +120,39 @@ export default function Dashboard() {
 
         {/* Posts Grid */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  {posts.map((post) => (
-    <div
-      key={post._id}
-      className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between"
-    >
-      {/* Post Content */}
-      <div>
-        <h3 className="text-2xl font-semibold text-gray-100 mb-3">{post.title}</h3>
-        <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
-        <p className="text-sm text-gray-500">
-          By {post.author.name}
-        </p>
-        <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
-        <Link
-          href={`/dashboard/${post._id}`}
-          className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
-        >
-          Read More
-        </Link>
-      </div>
+          {posts.map((post) => (
+            <div
+              key={post._id}
+              className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between"
+            >
+              {/* Post Content */}
+              <div>
+                <h3 className="text-2xl font-semibold text-gray-100 mb-3">{post.title}</h3>
+                <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
+                <p className="text-sm text-gray-500">
+                  By {post.author.name}
+                </p>
+                <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+                <Link
+                  href={`/dashboard/${post._id}`}
+                  className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
+                >
+                  Read More
+                </Link>
+              </div>
 
-      {/* Delete Button */}
-      {currentUser?.username === post.author.username && (
-        <button
-          onClick={() => handleDelete(post._id)}
-          className="absolute bottom-4 right-4 text-red-500 shadow-md hover:text-red-400 transition duration-200"
-        >
-          Delete
-        </button>
-      )}
-    </div>
-  ))}
-</section>
+              {/* Delete Button */}
+              {currentUser?.username === post.author.username && (
+                <button
+                  onClick={() => handleDelete(post._id)}
+                  className="absolute bottom-4 right-4 text-red-500 shadow-md hover:text-red-400 transition duration-200"
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+        </section>
 
       </main>
 
