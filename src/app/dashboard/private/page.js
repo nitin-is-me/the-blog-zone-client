@@ -91,7 +91,7 @@ export default function PrivatePosts() {
       </div>
 
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-300">My Private Posts</h1>
+        <h1 className="text-3xl font-semibold text-gray-200">My Private Posts</h1>
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
@@ -99,7 +99,7 @@ export default function PrivatePosts() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {posts.map((post) => (
           <div key={post._id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
-            <h2 className="text-xl font-bold text-gray-300 mb-4">{post.title}</h2>
+            <h2 className="text-xl font-semibold text-gray-300 mb-4">{post.title}</h2>
             <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
             <p className="text-sm text-gray-500">By {post.author.name}</p>
             <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>

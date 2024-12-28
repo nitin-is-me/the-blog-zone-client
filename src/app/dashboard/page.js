@@ -110,7 +110,7 @@ export default function Dashboard() {
       <main className="max-w-6xl mx-auto p-6">
         {/* Welcome Section */}
         <section className="mb-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-100">Welcome, {currentUser?.name || "Guest"}!</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-200">Welcome, {currentUser?.name || "Guest"}!</h2>
           <p className="text-lg text-gray-400 mt-2">
             Explore the latest blog posts or share your thoughts with the community.
           </p>
@@ -127,7 +127,7 @@ export default function Dashboard() {
             >
               {/* Post Content */}
               <div>
-                <h3 className="text-2xl font-semibold text-gray-100 mb-3">{post.title}</h3>
+                <h3 className="text-2xl font-semibold text-gray-300 mb-3">{post.title}</h3>
                 <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
                 <p className="text-sm text-gray-500">
                   By {post.author.name}
