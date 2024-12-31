@@ -45,7 +45,7 @@ export default function SignupPage() {
         )}
         <form onSubmit={handleSignup}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Name</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Name (displayed to others)</label>
             <input
               type="text"
               value={name}
@@ -55,7 +55,7 @@ export default function SignupPage() {
             />
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-400 mb-2">Username</label>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Username (must be unique)</label>
             <input
               type="text"
               value={username}
