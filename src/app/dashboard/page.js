@@ -19,17 +19,19 @@ export default function Dashboard() {
       if (token) {
         try {
           const response = await axios.get("https://the-blog-zone-server.vercel.app/api/auth/me", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           });
-          setCurrentUser(response.data); // the server returns user details
+          setCurrentUser(response.data);
         } catch (error) {
           console.error("Failed to fetch user info:", error);
+        } finally {
+          setUserLoading(false); // Set userLoading to false after fetching
         }
+      } else {
+        setUserLoading(false); // If no token, set userLoading to false
       }
     };
-
+  
     const fetchPosts = async () => {
       try {
         const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog");
@@ -37,13 +39,22 @@ export default function Dashboard() {
       } catch (error) {
         setError("Failed to fetch blog posts.");
       } finally {
-        setLoading(false);
+        setPostsLoading(false); // Set postsLoading to false after fetching
       }
     };
-
+  
+    setUserLoading(true); // Reset loading states before starting fetches
+    setPostsLoading(true);
+  
     fetchCurrentUser();
     fetchPosts();
   }, []);
+
+  // Set overall loading state
+  const [userLoading, setUserLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
+
+  const overallLoading = userLoading || postsLoading;
 
   const handleDelete = async (postId) => {
     const token = localStorage.getItem("token");
@@ -66,12 +77,12 @@ export default function Dashboard() {
     router.push("/");
   };
 
-  if (loading) {
+  if (overallLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-900">
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500"></div>
-          <p className="mt-4 text-gray-300 text-lg font-medium">Loading posts...</p>
+          <p className="mt-4 text-gray-300 text-lg font-medium">Loading...</p>
         </div>
       </div>
     );
