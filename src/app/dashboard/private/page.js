@@ -97,7 +97,10 @@ export default function PrivatePosts() {
       {error && <p className="text-red-500">{error}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {posts.map((post) => (
+        {posts.length === 0 ? (
+           <p className="text-gray-400 text-center col-span-full">No private posts, create one!</p>
+        ):(
+           posts.map((post) => (
           <div key={post._id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
             <h2 className="text-2xl font-semibold text-gray-300 mb-4">{post.title}</h2>
             <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
@@ -111,16 +114,26 @@ export default function PrivatePosts() {
               Read More
             </Link>
 
+            {/* Edit Button */}
             {currentUser?.username === post.author.username && (
-              <button
-                onClick={() => handleDelete(post._id)}
-                className="absolute bottom-4 right-4 text-red-500 hover:text-red-400 transition duration-200"
-              >
-                Delete
-              </button>
+              <div className="absolute bottom-4 right-4 flex gap-6">
+                <button
+                  onClick={() => router.push(`/dashboard/edit-blog/${post._id}`)}
+                  className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(post._id)}
+                  className="text-red-500 shadow-md hover:text-red-400 transition duration-200"
+                >
+                  Delete
+                </button>
+              </div>
             )}
+
           </div>
-        ))}
+        )))}
       </div>
     </div>
   );

@@ -142,14 +142,24 @@ export default function Dashboard() {
               </div>
 
               {/* Delete Button */}
+              {/* Edit Button */}
               {currentUser?.username === post.author.username && (
-                <button
-                  onClick={() => handleDelete(post._id)}
-                  className="absolute bottom-4 right-4 text-red-500 shadow-md hover:text-red-400 transition duration-200"
-                >
-                  Delete
-                </button>
+                <div className="absolute bottom-4 right-4 flex gap-6">
+                  <button
+                    onClick={() => router.push(`/dashboard/edit-blog/${post._id}`)}
+                    className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(post._id)}
+                    className="text-red-500 shadow-md hover:text-red-400 transition duration-200"
+                  >
+                    Delete
+                  </button>
+                </div>
               )}
+
             </div>
           ))}
         </section>
