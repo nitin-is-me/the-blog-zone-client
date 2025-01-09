@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
@@ -40,19 +39,9 @@ export default function Home() {
     checkAuth();
   }, []);
 
-  const handleLoginClick = () => {
-    setButtonLoading({ ...buttonLoading, login: true });
-    router.push("/login");
-  };
-
-  const handleSignupClick = () => {
-    setButtonLoading({ ...buttonLoading, signup: true });
-    router.push("/signup");
-  };
-
-  const handleDashboardClick = () => {
-    setButtonLoading({ ...buttonLoading, dashboard: true });
-    router.push("/dashboard");
+  const handleButtonClick = (type) => {
+    setButtonLoading((prev) => ({ ...prev, [type]: true }));
+    router.push(`/${type}`);
   };
 
   if (loading) {
@@ -67,51 +56,69 @@ export default function Home() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-900">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-md w-full">
-        <h1 className="text-4xl font-bold text-indigo-500 mb-6">Welcome to The Blog Zone</h1>
-        <p className="text-gray-400 mb-6">
-          Dive into a world of creativity, ideas, and stories. Share yours or explore what others have to say.
-        </p>
-        {isAuthenticated ? (
-          <button
-            disabled={buttonLoading.dashboard}
-            onClick={handleDashboardClick}
-            className="block bg-indigo-600 mx-auto text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
-          >
-            {buttonLoading.dashboard ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
-            ) : (
-              "Go to Dashboard"
-            )}
-          </button>
-        ) : (
-          <div className="flex justify-center gap-4">
+    <div className="flex flex-col justify-between min-h-screen bg-gray-900">
+      {/* Main Content */}
+      <div className="flex justify-center items-center flex-grow">
+        <div className="bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-md w-full">
+          <h1 className="text-4xl font-bold text-indigo-500 mb-6">Welcome to The Blog Zone</h1>
+          <p className="text-gray-400 mb-6">
+            Dive into a world of creativity, ideas, and stories. Share yours or explore what others have to say.
+          </p>
+          {isAuthenticated ? (
             <button
-              disabled={buttonLoading.login}
-              onClick={handleLoginClick}
-              className="flex items-center justify-center gap-2 bg-blue-600 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+              disabled={buttonLoading.dashboard}
+              onClick={() => handleButtonClick("dashboard")}
+              className="block bg-indigo-600 mx-auto text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
             >
-              {buttonLoading.login ? (
+              {buttonLoading.dashboard ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
               ) : (
-                "Login"
+                "Go to Dashboard"
               )}
             </button>
-            <button
-              disabled={buttonLoading.signup}
-              onClick={handleSignupClick}
-              className="flex items-center justify-center gap-2 bg-indigo-600 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
-            >
-              {buttonLoading.signup ? (
-                <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
-              ) : (
-                "Sign Up"
-              )}
-            </button>
-          </div>
-        )}
+          ) : (
+            <div className="flex justify-center gap-4">
+              <button
+                disabled={buttonLoading.login}
+                onClick={() => handleButtonClick("login")}
+                className="flex items-center justify-center gap-2 bg-blue-600 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-200"
+              >
+                {buttonLoading.login ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
+                ) : (
+                  "Login"
+                )}
+              </button>
+              <button
+                disabled={buttonLoading.signup}
+                onClick={() => handleButtonClick("signup")}
+                className="flex items-center justify-center gap-2 bg-indigo-600 text-white text-lg font-medium py-3 px-6 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200"
+              >
+                {buttonLoading.signup ? (
+                  <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
+                ) : (
+                  "Sign Up"
+                )}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Footer */}
+      <footer className="py-4 text-center">
+        <p className="text-gray-400 text-sm">
+          Made with ❤ by{" "}
+          <a
+            href="https://github.com/nitin-is-me"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-indigo-500 hover:underline"
+          >
+            Nitin
+          </a>
+        </p>
+      </footer>
     </div>
   );
 }
