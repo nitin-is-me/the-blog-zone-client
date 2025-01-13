@@ -102,11 +102,7 @@ export default function Home() {
               </button>
             </div>
           )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="py-4 text-center">
+      <footer className="pt-6 text-center">
         <p className="text-gray-400 text-sm">
           Made with ❤ by{" "}
           <a
@@ -119,6 +115,9 @@ export default function Home() {
           </a>
         </p>
       </footer>
+        </div>
+      </div>
+
     </div>
   );
 }

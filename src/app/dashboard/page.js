@@ -108,7 +108,8 @@ export default function Dashboard() {
             {logoutLoading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
             ) : (
-              "Logout"
+              // "Logout"
+              <i class="bi bi-box-arrow-right text-white"></i>
             )}
           </button>
         </div>
