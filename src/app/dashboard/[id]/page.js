@@ -70,6 +70,9 @@ export default function BlogPostPage() {
 
     try {
       const token = localStorage.getItem("token"); // Assuming token is stored in localStorage
+      if(!token){
+        return setCommentError("You must be logged in to comment.")
+      }
       const response = await axios.post(
         `https://the-blog-zone-server.vercel.app/api/blog/${id}/comments`,
         { content: newComment },
@@ -83,7 +86,7 @@ export default function BlogPostPage() {
       setComments(commentResponse.data.comments);
       setNewComment(""); // Reset comment input
     } catch (error) {
-      setCommentError(error?.response?.message || "Failed to submit comment. If you aren't logged in, please do.");
+      setCommentError(error?.response?.message || "Failed to submit comment.");
     } finally {
       setIsSubmitting(false);
     }

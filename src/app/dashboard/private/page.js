@@ -31,6 +31,10 @@ export default function PrivatePosts() {
 
     const fetchPrivatePosts = async () => {
       const token = localStorage.getItem("token");
+      if(!token){
+        setLoading(false);
+        return setError("You must be logged in to see your private posts");
+      }
       try {
         const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog/blogs/private", {
           headers: {
