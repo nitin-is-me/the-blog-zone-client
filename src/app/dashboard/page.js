@@ -11,6 +11,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [deletingPostId, setDeletingPostId]=useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function Dashboard() {
   const overallLoading = userLoading || postsLoading;
 
   const handleDelete = async (postId) => {
+    setDeletingPostId(postId);
     const token = localStorage.getItem("token");
     try {
       await axios.delete(`https://the-blog-zone-server.vercel.app/api/blog/delete/${postId}`, {
@@ -64,10 +66,12 @@ export default function Dashboard() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setPosts(posts.filter((post) => post._id !== postId)); // Update the UI
+      setPosts(posts.filter((post) => post.id !== postId)); // Update the UI
     } catch (error) {
       console.error("Failed to delete post:", error);
       setError("Could not delete the post. Try again.");
+    } finally{
+      setDeletingPostId(null);
     }
   };
 
@@ -134,7 +138,7 @@ export default function Dashboard() {
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
             <div
-              key={post._id}
+              key={post.id}
               className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between"
             >
               {/* Post Content */}
@@ -142,32 +146,33 @@ export default function Dashboard() {
                 <h3 className="text-2xl font-semibold text-gray-300 mb-3">{post.title}</h3>
                 <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
                 <p className="text-sm text-gray-500">
-                  By {post.author.name}
+                  By {post.Blogger.name}
                 </p>
                 <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
                 <Link
-                  href={`/dashboard/${post._id}`}
+                  href={`/dashboard/${post.id}`}
                   className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
                 >
                   Read More
                 </Link>
               </div>
 
-              {/* Delete Button */}
               {/* Edit Button */}
-              {currentUser?.username === post.author.username && (
+              {currentUser?.username === post.Blogger.username && (
                 <div className="absolute bottom-4 right-4 flex gap-6">
                   <button
-                    onClick={() => router.push(`/dashboard/edit-blog/${post._id}`)}
+                    onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
                     className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
-                  >
+                    >
                     Edit
                   </button>
+                    {/* Delete Button */}
                   <button
-                    onClick={() => handleDelete(post._id)}
-                    className="text-red-500 shadow-md hover:text-red-400 transition duration-200"
+                    onClick={() => handleDelete(post.id)}
+                    className="text-red-500 shadow-md hover:text-red-700 transition duration-200"
+                    disabled={deletingPostId === post.id}
                   >
-                    Delete
+                    {deletingPostId === post.id ? "Deleting..." : "Delete"}
                   </button>
                 </div>
               )}

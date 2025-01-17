@@ -8,7 +8,7 @@ export default function BlogPostPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [comments, setComments] = useState([]);
+  const [Comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [commentError, setCommentError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +24,7 @@ export default function BlogPostPage() {
       try {
         const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
         setPost(response.data);
-        setComments(response.data.comments || []);
+        setComments(response.data.Comments || []);
       } catch (error) {
         setError("Failed to fetch the blog post.");
       } finally {
@@ -80,7 +80,7 @@ export default function BlogPostPage() {
         }
       );
       const commentResponse = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
-      setComments(commentResponse.data.comments);
+      setComments(commentResponse.data.Comments);
       setNewComment(""); // Reset comment input
     } catch (error) {
       setCommentError(error?.response?.message || "Failed to submit comment. If you aren't logged in, please do.");
@@ -104,7 +104,7 @@ export default function BlogPostPage() {
 
       // Update the UI by removing the deleted comment
       setComments((prevComments) =>
-        prevComments.filter((comment) => comment._id !== commentId)
+        prevComments.filter((comment) => comment.id !== commentId)
       );
     } catch (error) {
       setError("Failed to delete the comment. Please try again.");
@@ -142,7 +142,7 @@ export default function BlogPostPage() {
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
             <h1 className="text-3xl font-bold text-gray-100 mb-6">{post.title}</h1>
             <p className="text-gray-400 mb-4 whitespace-pre-wrap">{post.content}</p>
-            <p className="text-sm text-gray-500">By {post.author.name}</p>
+            <p className="text-sm text-gray-500">By {post.Blogger.name}</p>
             <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
           </div>
         )}
@@ -170,25 +170,25 @@ export default function BlogPostPage() {
 
           {/* Display Comments */}
           <div className="space-y-4">
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <div key={comment._id} className="p-4 rounded-lg bg-gray-800 flex flex-col justify-between">
+            {Comments.length > 0 ? (
+              Comments.map((comment) => (
+                <div key={comment.id} className="p-4 rounded-lg bg-gray-800 flex flex-col justify-between">
                   <div>
                     <p className="text-gray-300">{comment.content}</p>
                     <p className="text-xs text-gray-500 mt-1">
-                      By {comment.author?.name || "anonymous"} &middot;{" "}
+                      By {comment.Blogger?.name || "anonymous"} &middot;{" "}
                       {formatTimeAgo(comment.createdAt)}
                     </p>
                   </div>
 
                   {/* Delete Button */}
-                  {loggedInUser?.username === comment.author?.username && (
+                  {loggedInUser?.username === comment.Blogger?.username && (
                     <button
-                      onClick={() => handleDeleteComment(comment._id)}
+                      onClick={() => handleDeleteComment(comment.id)}
                       className="self-end mt-2 text-red-500 hover:text-red-700"
-                      disabled={deletingCommentId === comment._id}
+                      disabled={deletingCommentId === comment.id}
                     >
-                      {deletingCommentId === comment._id ? "Deleting..." : "Delete"}
+                      {deletingCommentId === comment.id ? "Deleting..." : "Delete"}
                     </button>
                   )}
                 </div>

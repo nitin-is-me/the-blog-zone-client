@@ -10,6 +10,8 @@ export default function PrivatePosts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [deletingPostId, setDeletingPostId]=useState(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -58,6 +60,7 @@ export default function PrivatePosts() {
   };
 
   const handleDelete = async (postId) => {
+    setDeletingPostId(postId);
     const token = localStorage.getItem("token");
     try {
       await axios.delete(`https://the-blog-zone-server.vercel.app/api/blog/delete/${postId}`, {
@@ -65,10 +68,12 @@ export default function PrivatePosts() {
           Authorization: `Bearer ${token}`,
         },
       });
-      setPosts(posts.filter((post) => post._id !== postId)); // Update the UI
+      setPosts(posts.filter((post) => post.id !== postId)); // Update the UI
     } catch (error) {
       console.error("Failed to delete post:", error);
       setError("Could not delete the post. Try again.");
+    } finally{
+      setDeletingPostId(null);
     }
   };
 
@@ -105,33 +110,34 @@ export default function PrivatePosts() {
            <p className="text-gray-400 text-center col-span-full">No private posts, create one!</p>
         ):(
            posts.map((post) => (
-          <div key={post._id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
+          <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
             <h2 className="text-2xl font-semibold text-gray-300 mb-4">{post.title}</h2>
             <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
-            <p className="text-sm text-gray-500">By {post.author.name}</p>
+            <p className="text-sm text-gray-500">By {post.Blogger.name}</p>
             <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
 
             <Link
-              href={`/dashboard/private/${post._id}`}
+              href={`/dashboard/private/${post.id}`}
               className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
             >
               Read More
             </Link>
 
             {/* Edit Button */}
-            {currentUser?.username === post.author.username && (
+            {currentUser?.username === post.Blogger.username && (
               <div className="absolute bottom-4 right-4 flex gap-6">
                 <button
-                  onClick={() => router.push(`/dashboard/edit-blog/${post._id}`)}
+                  onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
                   className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDelete(post._id)}
-                  className="text-red-500 shadow-md hover:text-red-400 transition duration-200"
+                  onClick={() => handleDelete(post.id)}
+                  className="text-red-500 shadow-md hover:text-red-700 transition duration-200"
+                  disabled={deletingPostId === post.id}
                 >
-                  Delete
+                  {deletingPostId === post.id ? "Deleting..." : "Delete"}
                 </button>
               </div>
             )}
