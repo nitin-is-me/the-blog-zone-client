@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
-  const [deletingPostId, setDeletingPostId]=useState(null);
+  const [deletingPostId, setDeletingPostId] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function Dashboard() {
         setUserLoading(false); // If no token, set userLoading to false
       }
     };
-  
+
     const fetchPosts = async () => {
       try {
         const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog");
@@ -43,10 +43,10 @@ export default function Dashboard() {
         setPostsLoading(false); // Set postsLoading to false after fetching
       }
     };
-  
+
     setUserLoading(true); // Reset loading states before starting fetches
     setPostsLoading(true);
-  
+
     fetchCurrentUser();
     fetchPosts();
   }, []);
@@ -58,6 +58,11 @@ export default function Dashboard() {
   const overallLoading = userLoading || postsLoading;
 
   const handleDelete = async (postId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+    if (!confirmDelete) {
+      return;
+    }
+
     setDeletingPostId(postId);
     const token = localStorage.getItem("token");
     try {
@@ -70,7 +75,7 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Failed to delete post:", error);
       setError("Could not delete the post. Try again.");
-    } finally{
+    } finally {
       setDeletingPostId(null);
     }
   };
@@ -163,10 +168,10 @@ export default function Dashboard() {
                   <button
                     onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
                     className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
-                    >
+                  >
                     Edit
                   </button>
-                    {/* Delete Button */}
+                  {/* Delete Button */}
                   <button
                     onClick={() => handleDelete(post.id)}
                     className="text-red-500 shadow-md hover:text-red-700 transition duration-200"

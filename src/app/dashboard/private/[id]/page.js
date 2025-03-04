@@ -90,6 +90,11 @@ export default function BlogPostPage() {
   };
 
   const handleDeleteComment = async (commentId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this comment?");
+    if (!confirmDelete) {
+      return;
+    }
+
     setDeletingCommentId(commentId); // Set the comment as deleting
 
     try {

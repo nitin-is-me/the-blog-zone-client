@@ -60,6 +60,11 @@ export default function PrivatePosts() {
   };
 
   const handleDelete = async (postId) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this post?");
+    if (!confirmDelete) {
+      return;
+    }
+    
     setDeletingPostId(postId);
     const token = localStorage.getItem("token");
     try {
