@@ -9,6 +9,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
   const router = useRouter();
 
   const handleLogin = async (e) => {
@@ -32,6 +33,10 @@ export default function LoginPage() {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-900">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -50,15 +55,29 @@ export default function LoginPage() {
               required
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-6 relative">
             <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-3 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full p-3 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-300"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <i className="bi bi-eye-slash-fill"></i>
+                ) : (
+                  <i className="bi bi-eye-fill"></i>
+                )}
+              </button>
+            </div>
           </div>
           <button
             type="submit"
