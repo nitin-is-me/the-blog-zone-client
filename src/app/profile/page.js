@@ -33,7 +33,7 @@ export default function Profile() {
       }
 
       try {
-        const response = await axios.get("https://the-blog-zone-server.vercel.app:8000/api/auth/me", {
+        const response = await axios.get("https://the-blog-zone-server.vercel.app/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -138,7 +138,7 @@ export default function Profile() {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        "https://the-blog-zone-server.vercel.app:8000/api/auth/changePassword",
+        "https://the-blog-zone-server.vercel.app/api/auth/changePassword",
         {
           newPassword: formData.newPassword
         },
