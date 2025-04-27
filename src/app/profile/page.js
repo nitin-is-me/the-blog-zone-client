@@ -196,7 +196,7 @@ export default function Profile() {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        "https://the-blog-zone-server.verce.app/api/auth/changePassword",
+        "https://the-blog-zone-server.vercel.app/api/auth/changePassword",
         {
           newPassword: formData.newPassword
         },
