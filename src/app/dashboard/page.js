@@ -101,7 +101,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-900 text-gray-300">
       {/* Top Navigation */}
       <header className="bg-gray-800 py-2 px-4 flex justify-between items-center shadow-md sticky top-0 z-10">
-        <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">The Blog Zone</h1>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/profile"
+            className="text-gray-300 hover:text-indigo-400 transition duration-200"
+          >
+            <i className="bi bi-person-circle text-xl"></i>
+          </Link>
+          <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">The Blog Zone</h1>
+        </div>
         <div className="flex gap-2 sm:gap-4">
           <Link
             href="/dashboard/private"
@@ -117,7 +125,6 @@ export default function Dashboard() {
             {logoutLoading ? (
               <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white"></div>
             ) : (
-              // "Logout"
               <i className="bi bi-box-arrow-right text-white"></i>
             )}
           </button>
