@@ -277,7 +277,7 @@ export default function Profile() {
                   className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed opacity-70"
                   disabled
                 />
-                <p className="mt-1 text-xs text-gray-500">Username cannot be changed</p>
+                <p className="mt-1 text-xs text-gray-500">Username cannot be changed (yet).</p>
               </div>
 
               <div>
