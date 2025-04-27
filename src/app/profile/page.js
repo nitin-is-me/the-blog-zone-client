@@ -335,6 +335,7 @@ export default function Profile() {
                   value={formData.newUsername}
                   onChange={handleUsernameChange}
                   className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
                 />
                 {usernameError && (
                   <div className="text-red-500 text-sm mt-1">{usernameError}</div>
