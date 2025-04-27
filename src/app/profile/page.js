@@ -104,64 +104,77 @@ export default function Profile() {
   };
 
   const updateProfile = async (e) => {
-    e.preventDefault();
-    setUpdating(true);
-    setError("");
-    setSuccess("");
+  e.preventDefault();
+  setUpdating(true);
+  setError("");
+  setSuccess("");
 
-    if (/\s/.test(formData.newUsername)) {
-      setError("Username cannot contain spaces");
-      setUpdating(false);
-      return;
+  if (/\s/.test(formData.newUsername)) {
+    setError("Username cannot contain spaces");
+    setUpdating(false);
+    return;
+  }
+
+  let token = localStorage.getItem("token");
+  try {
+    const trimmedName = formData.name.trim();
+    const payload = {
+      name: trimmedName
+    };
+
+    // Only include newUsername in the payload if it's different from the current username
+    if (formData.newUsername !== formData.username) {
+      payload.newUsername = formData.newUsername;
     }
 
-    let token = localStorage.getItem("token");
-    try {
-      const trimmedName = formData.name.trim();
-
-      const response = await axios.put(
-        "https://the-blog-zone-server.vercel.app/api/auth/updateProfile",
-        {
-          name: trimmedName,
-          newUsername: formData.newUsername
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      // Store the new token (to update our username in jwt stored locally)
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+    const response = await axios.put(
+      "https://the-blog-zone-server.vercel.app/api/auth/updateProfile",
+      payload,
+      {
+        headers: { Authorization: `Bearer ${token}` }
       }
-      // Update all relevant state
-      setCurrentUser({
-        ...currentUser,
-        name: trimmedName,
-        username: formData.newUsername,
-      });
-
-      setFormData(prev => ({
-        ...prev,
-        name: trimmedName,
-        username: formData.newUsername,
-        newUsername: formData.newUsername
-      }));
-
-      setSuccess("Profile updated successfully!");
-
-    } catch (error) {
-      console.error("Failed to update profile:", error);
-      setError(error.response?.data?.message || "Failed to update profile. Please try again.");
-
-      // If the error is due to an invalid token, redirect to login
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        router.push("/");
-      }
-    } finally {
-      setUpdating(false);
+    );
+    
+    // Store the new token (to update our username in jwt stored locally)
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
     }
-  };
+    
+    // Update all relevant state
+    const updatedUser = {
+      ...currentUser,
+      name: trimmedName,
+    };
+
+    // Only update username if it was changed
+    if (formData.newUsername !== formData.username) {
+      updatedUser.username = formData.newUsername;
+    }
+
+    setCurrentUser(updatedUser);
+
+    setFormData(prev => ({
+      ...prev,
+      name: trimmedName,
+      username: updatedUser.username,
+      newUsername: updatedUser.username
+    }));
+
+    setSuccess("Profile updated successfully!");
+
+  } catch (error) {
+    console.error("Failed to update profile:", error);
+    setError(error.response?.data?.message || "Failed to update profile. Please try again.");
+
+    // If the error is due to an invalid token, redirect to login
+    if (error.response?.status === 401) {
+      localStorage.removeItem("token");
+      router.push("/");
+    }
+  } finally {
+    setUpdating(false);
+  }
+};
 
   const updatePassword = async (e) => {
     e.preventDefault();
