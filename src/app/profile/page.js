@@ -14,11 +14,13 @@ export default function Profile() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const router = useRouter();
 
   const [formData, setFormData] = useState({
     name: "",
     username: "",
+    newUsername: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -26,7 +28,7 @@ export default function Profile() {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
+      let token = localStorage.getItem("token");
       if (!token) {
         router.push("/");
         return;
@@ -41,12 +43,19 @@ export default function Profile() {
         setFormData({
           name: response.data.name || "",
           username: response.data.username || "",
+          newUsername: response.data.username || "",
           newPassword: "",
           confirmPassword: ""
         });
       } catch (error) {
         console.error("Failed to fetch user info:", error);
         setError("Failed to load user information. Please try again.");
+
+        // If unauthorized, remove token and redirect
+        if (error.response?.status === 401) {
+          localStorage.removeItem("token");
+          router.push("/");
+        }
       } finally {
         setLoading(false);
       }
@@ -55,12 +64,28 @@ export default function Profile() {
     fetchUserData();
   }, [router]);
 
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleUsernameChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Validate for spaces in real-time
+    if (/\s/.test(value)) {
+      setUsernameError("Spaces are not allowed in username");
+    } else {
+      setUsernameError("");
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -84,35 +109,55 @@ export default function Profile() {
     setError("");
     setSuccess("");
 
-    const token = localStorage.getItem("token");
+    if (/\s/.test(formData.newUsername)) {
+      setError("Username cannot contain spaces");
+      setUpdating(false);
+      return;
+    }
+
+    let token = localStorage.getItem("token");
     try {
-      // Trim the name before sending
       const trimmedName = formData.name.trim();
 
-      await axios.put(
+      const response = await axios.put(
         "https://the-blog-zone-server.vercel.app/api/auth/updateProfile",
         {
           name: trimmedName,
+          newUsername: formData.newUsername
         },
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-
-      setSuccess("Profile updated successfully!");
-      // Update the current user state with the new info
-      setCurrentUser(prev => ({
-        ...prev,
+      // Store the new token (to update our username in jwt stored locally)
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      // Update all relevant state
+      setCurrentUser({
+        ...currentUser,
         name: trimmedName,
-      }));
-      // Also update the form data with trimmed name
+        username: formData.newUsername,
+      });
+
       setFormData(prev => ({
         ...prev,
-        name: trimmedName
+        name: trimmedName,
+        username: formData.newUsername,
+        newUsername: formData.newUsername
       }));
+
+      setSuccess("Profile updated successfully!");
+
     } catch (error) {
       console.error("Failed to update profile:", error);
       setError(error.response?.data?.message || "Failed to update profile. Please try again.");
+
+      // If the error is due to an invalid token, redirect to login
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/");
+      }
     } finally {
       setUpdating(false);
     }
@@ -138,7 +183,7 @@ export default function Profile() {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        "https://the-blog-zone-server.vercel.app/api/auth/changePassword",
+        "https://the-blog-zone-server.verce.app/api/auth/changePassword",
         {
           newPassword: formData.newPassword
         },
@@ -266,8 +311,8 @@ export default function Profile() {
               </div>
 
               <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-400 mb-1">
-                  Username
+                <label htmlFor="currentUsername" className="block text-sm font-medium text-gray-400 mb-1">
+                  Current Username
                 </label>
                 <input
                   type="text"
@@ -277,14 +322,30 @@ export default function Profile() {
                   className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-not-allowed opacity-70"
                   disabled
                 />
-                <p className="mt-1 text-xs text-gray-500">Username cannot be changed (yet).</p>
+              </div>
+
+              <div>
+                <label htmlFor="newUsername" className="block text-sm font-medium text-gray-400 mb-1">
+                  New Username
+                </label>
+                <input
+                  type="text"
+                  id="newUsername"
+                  name="newUsername"
+                  value={formData.newUsername}
+                  onChange={handleUsernameChange}
+                  className="w-full bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                {usernameError && (
+                  <div className="text-red-500 text-sm mt-1">{usernameError}</div>
+                )}
               </div>
 
               <div>
                 <button
                   type="submit"
                   className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex justify-center"
-                  disabled={updating}
+                  disabled={updating || usernameError}
                 >
                   {updating ? (
                     <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
