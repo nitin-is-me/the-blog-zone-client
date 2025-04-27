@@ -10,17 +10,35 @@ export default function SignupPage() {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // New state for password visibility
+  const [showPassword, setShowPassword] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const router = useRouter();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+
+    // Validate fields
+    if (/\s/.test(username)) {
+      setUsernameError("Spaces are not allowed");
+      return;
+    }
+
+    if (/\s/.test(password)) {
+      setPasswordError("Spaces are not allowed");
+      return;
+    }
+
+    // Trim name (but allow spaces between words)
+    const trimmedName = name.trim();
+
     setLoading(true);
+    setError("");
 
     try {
       const response = await axios.post("https://the-blog-zone-server.vercel.app/api/auth/signup", {
         username,
-        name,
+        name: trimmedName,
         password,
       });
 
@@ -37,8 +55,29 @@ export default function SignupPage() {
     }
   };
 
+  const handleUsernameChange = (e) => {
+    const value = e.target.value;
+    setUsername(value);
+    setUsernameError(/\s/.test(value) ? "Spaces are not allowed" : "");
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    setPasswordError(/\s/.test(value) ? "Spaces are not allowed" : "");
+  };
+
+  const handleNameChange = (e) => {
+    // No validation needed for name - just update state
+    setName(e.target.value);
+  };
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const isFormValid = () => {
+    return username && password && name && !usernameError && !passwordError;
   };
 
   return (
@@ -54,7 +93,7 @@ export default function SignupPage() {
             <input
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={handleNameChange}
               className="w-full p-3 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               required
             />
@@ -64,10 +103,13 @@ export default function SignupPage() {
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               className="w-full p-3 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none"
               required
             />
+            {usernameError && (
+              <p className="text-red-500 text-sm mt-1">{usernameError}</p>
+            )}
           </div>
           <div className="mb-6 relative">
             <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
@@ -75,7 +117,7 @@ export default function SignupPage() {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 className="w-full p-3 rounded bg-gray-700 text-gray-200 border border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:outline-none pr-10"
                 required
               />
@@ -92,13 +134,15 @@ export default function SignupPage() {
                 )}
               </button>
             </div>
+            {passwordError && (
+              <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+            )}
           </div>
           <button
             type="submit"
-            className={`w-full flex justify-center items-center bg-indigo-600 text-white p-3 rounded-lg font-medium ${
-              loading ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
-            }`}
-            disabled={loading}
+            className={`w-full flex justify-center items-center bg-indigo-600 text-white p-3 rounded-lg font-medium ${loading || !isFormValid() ? "opacity-70 cursor-not-allowed" : "hover:bg-indigo-700"
+              }`}
+            disabled={loading || !isFormValid()}
           >
             {loading ? (
               <svg
