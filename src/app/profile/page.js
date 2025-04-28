@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { formatTimeAgo } from "../utils/formatTime";
 
 export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -264,6 +265,7 @@ export default function Profile() {
             <div className="text-center sm:text-left">
               <h2 className="text-2xl font-bold text-gray-200">{currentUser?.name}</h2>
               <p className="text-gray-400">@{currentUser?.username}</p>
+              <small className="text-gray-400">Member since: {formatTimeAgo(currentUser.createdAt).split(",")[0].trim()}</small>
             </div>
           </div>
         </div>
