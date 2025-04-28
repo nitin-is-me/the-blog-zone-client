@@ -17,6 +17,26 @@ You can comment on a post to tell what you feel about the post, and can delete i
 ### Change account information anytime (26/04/25)
 You can change your display name, username (this part was really tough) and password by clicking on the top left icon on dashboard page. Spaces in password and username are not allowed from now.
 
+## Version History
+| Version | Date       | Summary         |
+|---------|------------|-----------------|
+|1.0      | **11-Nov-2024** | First push to Github. Project was stored locally for many days, because I couldn't fix problem during login detection, so I'll just store the jwt token in localstorage (I was planning to use cookies, but many browsers block cross-site cookies). Basic feature like post creation and deletion is added. I'll continue the project after college exams. |
+|1.1      | **20-Dec-2024** | I had added some credentials related to database connection in server.js, so I had to delete whole commit history in case a nerd tries to hack into my database (Stupid me). Changed signup flow. |
+|1.2      | **26-Dec-2024** | Added comment feature. |
+|1.3      | **27-Dec-2024** | Changed website's theme from light to dark mode. |
+|1.4      | **28-Dec-2024** | Changed theme's colors and made the website mobile friendly by adding screen responsiveness. |
+|1.5      | **31-Dec-2024** | Changed some text labels, like: Username (must be unique). |
+|1.6      | **06-Jan-2025** | Added edit feature, missing loading icons in some pages. Also fixed posts fetching before/after user information, resulting in posts being blank while information is loaded and vice versa. |
+|1.7      | **09-Jan-2025** | Added my github link in dashboard page. |
+|1.8      | **13-Jan-2025** | Made some changes in UI. |
+|1.9      | **14-Jan-2025** | Improved error handling (the most irritating part). |
+|2.0      | **17-Jan-2025** | Migrated to PostgreSQL, ditched MongoDB. Scaling is efficient now. |
+|2.1      | **04-Mar-2025** | Added confirmation on post and comment deletion. |
+|2.2      | **10-Mar-2025** | Switched from <time>ago format to exact <date>,<time> format. It's better when you want to know the exact date and time of writing that post. |
+|2.3      | **29-Mar-2025** | Added eye icon on password. How could I forget this lol, my friend pointed that out. |
+|2.4      | **27-Apr-2025** | Added profile page with features to update name, username (toughest part) and password. The icon will be at top left. From now on, no spaces in username and password are allowed |
+|2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
+
 --------------
 ### Contribute to the project
 The Blog Zone is an open source project, hence it welcomes all improvements from anyone interested. New features will be coming soon, thanks!
