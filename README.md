@@ -8,7 +8,7 @@ You are given a choice whether you want to make your post publicly visible, or m
 ### Wanna make changes or remove post?
 You can edit the post anytime, and for privacy I haven't added the "updatedAt" visibility. Don't like the post? Delete it anytime (I added confirmation prompt later for deletion functions).
 ### Exact date and time of post
-Unlike many social medias where post is in "<time> ago" format, you'll see exact date and time of your post. (I implementing "<time> ago" format before, but exact time is more practical).
+Unlike many social medias where post is in "<time> ago" format, you'll see exact date and time of your post. (I implemented "<time> ago" format before, but exact time is more practical).
 ### Scalable and rigid database
 I've switched from Non - relational database (MongoDB) to Relational database (PostgreSQL), so the application is scalable, and the data relations are much better and strong.
 ### Show what you feel about a post
