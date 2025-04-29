@@ -1,6 +1,8 @@
 ## The Blog zone
 The Blog Zone is your personal or public blogging platform without any posting rules. Post whatever you want, but try to maintain the dignity of the platform as much as possible. This repository is hosted directly on vercel, so the code is transparent. You can check the server side code <a href="https://github.com/nitin-is-me/the-blog-zone-server/">here</a>. <br>
 **The Project is live <a href="https://the-blog-zone.vercel.app">here</a>**
+
+## Features
 ### Account creation
 You don't need email or any type of identity to signup, just create a username, enter a strong password and you're done.
 ### Post Privacy
@@ -43,7 +45,7 @@ If I create a private post with title: "Test", and content: "Demo content", then
 |2.3      | **29-Mar-2025** | Added eye icon on password. How could I forget this lol, my friend pointed that out. |
 |2.4      | **27-Apr-2025** | Added profile page with features to update name, username (toughest part) and password. The icon will be at top left. From now on, no spaces in username and password are allowed |
 |2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
-|2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. |
+|2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. Also added privacy encryption notice in blog create/edit page. |
 
 --------------
 ### Contribute to the project
