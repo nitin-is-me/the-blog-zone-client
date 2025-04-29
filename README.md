@@ -14,7 +14,7 @@ I've switched from Non - relational database (MongoDB) to Relational database (P
 ### Show what you feel about a post
 You can comment on a post to tell what you feel about the post, and can delete it whenever you want.
 
-### Change account information anytime (26/04/25)
+### Change account information anytime
 You can change your display name, username (this part was really tough) and password by clicking on the top left icon on dashboard page. Spaces in password and username are not allowed from now.
 
 ## Version History
