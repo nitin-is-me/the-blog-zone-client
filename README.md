@@ -17,6 +17,9 @@ You can comment on a post to tell what you feel about the post, and can delete i
 ### Change account information anytime
 You can change your display name, username (this part was really tough) and password by clicking on the top left icon on dashboard page. Spaces in password and username are not allowed from now.
 
+### Private posts will be encrypted
+Your private posts are completely safe with node crypto encryption. Both title and content will be encrypted and original data will be replaced by some random letters and numbers before saving in database, and it'll only decrypt if the author himselfis trying to access the post. Downside: Now you can't share private posts with URL to anyone, because they aren't the author of the post. 
+
 ## Version History
 | Version | Date       | Summary         |
 |---------|------------|-----------------|
@@ -36,7 +39,7 @@ You can change your display name, username (this part was really tough) and pass
 |2.3      | **29-Mar-2025** | Added eye icon on password. How could I forget this lol, my friend pointed that out. |
 |2.4      | **27-Apr-2025** | Added profile page with features to update name, username (toughest part) and password. The icon will be at top left. From now on, no spaces in username and password are allowed |
 |2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
-|2.6      | **29-Apr-2025** | Big Update: Added content encryption in private posts. Example: In private post if the content is: "lol demo text", the encrypted text saved in the database will be "27927c868797e072b66ea484fe54be3f:0464a594d24e99841aa3e47e43ac84fc". So if someone has that this encrypted text, he can't decrypt it back. I myself will have to do too much hard work to decrypt it back. Also from now on, users can't see other user's private post even if shared the exact link, only the author himself can see his own private post now. Also removed unnecessary stuffs like, commenting and showing "By <author" in private posts, and some better error handling. |
+|2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. |
 
 --------------
 ### Contribute to the project
