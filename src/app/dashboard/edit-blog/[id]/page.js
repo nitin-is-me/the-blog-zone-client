@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function EditBlogPage() {
   const [title, setTitle] = useState('');
@@ -151,6 +152,23 @@ export default function EditBlogPage() {
                 />
                 Private
               </label>
+            </div>
+
+            {/* Privacy encryption notice */}
+            <div className="mt-2 text-xs text-indigo-400 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>
+                Private posts will be securely encrypted from now. {' '}
+                <Link
+                  href="https://github.com/nitin-is-me/the-blog-zone-client/blob/master/README.md#private-posts-will-be-encrypted"
+                  className="underline hover:text-indigo-300 transition-colors"
+                  target='_blank'
+                  rel='noopener noreferrer'>
+                  Learn more
+                </Link>
+              </span>
             </div>
           </div>
 
