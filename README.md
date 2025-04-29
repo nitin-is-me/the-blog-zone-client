@@ -36,6 +36,7 @@ You can change your display name, username (this part was really tough) and pass
 |2.3      | **29-Mar-2025** | Added eye icon on password. How could I forget this lol, my friend pointed that out. |
 |2.4      | **27-Apr-2025** | Added profile page with features to update name, username (toughest part) and password. The icon will be at top left. From now on, no spaces in username and password are allowed |
 |2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
+|2.6      | **29-Apr-2025** | Big Update: Added content encryption in private posts. Example: In private post if the content is: "lol demo text", the encrypted text saved in the database will be "27927c868797e072b66ea484fe54be3f:0464a594d24e99841aa3e47e43ac84fc". So if someone has that this encrypted text, he can't decrypt it back. I myself will have to do too much hard work to decrypt it back. |
 
 --------------
 ### Contribute to the project
