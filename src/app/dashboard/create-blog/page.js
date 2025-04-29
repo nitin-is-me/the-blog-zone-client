@@ -121,7 +121,7 @@ export default function CreateBlogPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <span>
-                Private posts will be encrypted from now. {' '}
+                Private posts will be securely encrypted from now. {' '}
                 <Link
                   href="https://github.com/nitin-is-me/the-blog-zone-client/blob/master/README.md#private-posts-will-be-encrypted"
                   className="underline hover:text-indigo-300 transition-colors"
