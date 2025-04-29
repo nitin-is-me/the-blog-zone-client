@@ -4,7 +4,7 @@ The Blog Zone is your personal or public blogging platform without any posting r
 ### Account creation
 You don't need email or any type of identity to signup, just create a username, enter a strong password and you're done.
 ### Post Privacy
-You are given a choice whether you want to make your post publicly visible, or make it private so it's only visible to the author himself.
+You are given a choice whether you want to make your post publicly visible, or make it private so it's only visible to the you.
 ### Wanna make changes or remove post?
 You can edit the post anytime, and for privacy I haven't added the "updatedAt" visibility. Don't like the post? Delete it anytime (I added confirmation prompt later for deletion functions).
 ### Exact date and time of post
