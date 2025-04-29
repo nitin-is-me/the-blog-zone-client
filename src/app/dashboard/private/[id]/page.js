@@ -21,12 +21,21 @@ export default function BlogPostPage() {
     if (!id) return;
 
     const fetchPost = async () => {
+      const token = localStorage.getItem("token");
+      if(!token){
+        setLoading(false);
+        return setError("You must be logged in to see this private post");
+      }
       try {
-        const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
+        const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`, {
+          headers:{
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setPost(response.data);
         setComments(response.data.Comments || []);
       } catch (error) {
-        setError("Failed to fetch the blog post.");
+        setError(error.response?.data?.message || "Failed to fetch the blog post.");
       } finally {
         setLoading(false);
       }
