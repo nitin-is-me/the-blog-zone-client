@@ -17,17 +17,27 @@ export default function EditBlogPage() {
   useEffect(() => {
     // Fetch the existing post details
     const fetchPost = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setLoading(false);
+        return setError("You must be logged in to edit post");
+      }
+
       try {
-        const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`);
+        const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const post = response.data;
         setTitle(post.title);
         setContent(post.content);
         setIsPrivate(post.private);
         setLoading(false);
       } catch (error) {
-        setError('Failed to fetch post details.');
+        setError(error.response?.data?.message || 'Failed to fetch post details.');
         setLoading(false);
-      } finally{
+      } finally {
         setLoading(false);
       }
     };
