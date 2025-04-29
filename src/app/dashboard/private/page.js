@@ -45,7 +45,7 @@ export default function PrivatePosts() {
         });
         setPosts(response.data);
       } catch (error) {
-        setError("Failed to fetch private posts.");
+        setError(error.response?.data?.message || "Failed to fetch private posts.");
       } finally {
         setLoading(false);
       }
