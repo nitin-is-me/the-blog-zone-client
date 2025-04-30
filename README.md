@@ -24,6 +24,8 @@ Your private posts are completely safe with node crypto encryption. Both title a
 #### Practical example
 If I create a private post with title: "Test", and content: "Demo content", then in my database, the data will be saved as:<br><br> ![image](https://github.com/user-attachments/assets/a769b34e-d9b8-42e7-b345-a45a2f10c2ef)
 
+### Search flawlessly through posts
+You can search through public/private posts with either "Title", "Content" or "Author"
 
 
 ## Version History
@@ -46,6 +48,7 @@ If I create a private post with title: "Test", and content: "Demo content", then
 |2.4      | **27-Apr-2025** | Added profile page with features to update name, username (toughest part) and password. The icon will be at top left. From now on, no spaces in username and password are allowed |
 |2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
 |2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. Also added privacy encryption notice in blog create/edit page. |
+|2.7      | **30-Apr-2025** | Added search through title, content or author feature for private/public posts. Logout button is moved to profile page now. |
 
 --------------
 ### Contribute to the project
