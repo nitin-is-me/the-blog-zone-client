@@ -9,6 +9,7 @@ export default function Profile() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [activeTab, setActiveTab] = useState("personal");
@@ -52,7 +53,6 @@ export default function Profile() {
         console.error("Failed to fetch user info:", error);
         setError("Failed to load user information. Please try again.");
 
-        // If unauthorized, remove token and redirect
         if (error.response?.status === 401) {
           localStorage.removeItem("token");
           router.push("/");
@@ -65,6 +65,11 @@ export default function Profile() {
     fetchUserData();
   }, [router]);
 
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    localStorage.removeItem("token");
+    router.push("/");
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,7 +86,6 @@ export default function Profile() {
       [name]: value
     }));
 
-    // Validate for spaces in real-time
     if (/\s/.test(value)) {
       setUsernameError("Spaces are not allowed in username");
     } else {
@@ -96,7 +100,6 @@ export default function Profile() {
       [name]: value
     }));
 
-    // Validate for spaces in real-time
     if (/\s/.test(value)) {
       setPasswordError("Spaces are not allowed in password");
     } else {
@@ -105,77 +108,72 @@ export default function Profile() {
   };
 
   const updateProfile = async (e) => {
-  e.preventDefault();
-  setUpdating(true);
-  setError("");
-  setSuccess("");
+    e.preventDefault();
+    setUpdating(true);
+    setError("");
+    setSuccess("");
 
-  if (/\s/.test(formData.newUsername)) {
-    setError("Username cannot contain spaces");
-    setUpdating(false);
-    return;
-  }
-
-  let token = localStorage.getItem("token");
-  try {
-    const trimmedName = formData.name.trim();
-    const payload = {
-      name: trimmedName
-    };
-
-    // Only include newUsername in the payload if it's different from the current username
-    if (formData.newUsername !== formData.username) {
-      payload.newUsername = formData.newUsername;
+    if (/\s/.test(formData.newUsername)) {
+      setError("Username cannot contain spaces");
+      setUpdating(false);
+      return;
     }
 
-    const response = await axios.put(
-      "https://the-blog-zone-server.vercel.app/api/auth/updateProfile",
-      payload,
-      {
-        headers: { Authorization: `Bearer ${token}` }
+    let token = localStorage.getItem("token");
+    try {
+      const trimmedName = formData.name.trim();
+      const payload = {
+        name: trimmedName
+      };
+
+      if (formData.newUsername !== formData.username) {
+        payload.newUsername = formData.newUsername;
       }
-    );
-    
-    // Store the new token (to update our username in jwt stored locally)
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
+
+      const response = await axios.put(
+        "https://the-blog-zone-server.vercel.app/api/auth/updateProfile",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+
+      const updatedUser = {
+        ...currentUser,
+        name: trimmedName,
+      };
+
+      if (formData.newUsername !== formData.username) {
+        updatedUser.username = formData.newUsername;
+      }
+
+      setCurrentUser(updatedUser);
+
+      setFormData(prev => ({
+        ...prev,
+        name: trimmedName,
+        username: updatedUser.username,
+        newUsername: updatedUser.username
+      }));
+
+      setSuccess("Profile updated successfully!");
+
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      setError(error.response?.data?.message || "Failed to update profile. Please try again.");
+
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        router.push("/");
+      }
+    } finally {
+      setUpdating(false);
     }
-    
-    // Update all relevant state
-    const updatedUser = {
-      ...currentUser,
-      name: trimmedName,
-    };
-
-    // Only update username if it was changed
-    if (formData.newUsername !== formData.username) {
-      updatedUser.username = formData.newUsername;
-    }
-
-    setCurrentUser(updatedUser);
-
-    setFormData(prev => ({
-      ...prev,
-      name: trimmedName,
-      username: updatedUser.username,
-      newUsername: updatedUser.username
-    }));
-
-    setSuccess("Profile updated successfully!");
-
-  } catch (error) {
-    console.error("Failed to update profile:", error);
-    setError(error.response?.data?.message || "Failed to update profile. Please try again.");
-
-    // If the error is due to an invalid token, redirect to login
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      router.push("/");
-    }
-  } finally {
-    setUpdating(false);
-  }
-};
+  };
 
   const updatePassword = async (e) => {
     e.preventDefault();
@@ -252,6 +250,19 @@ export default function Profile() {
           </Link>
           <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">Profile Settings</h1>
         </div>
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1.5 rounded-full items-center gap-2 bg-red-500 text-white"
+          disabled={logoutLoading}
+        >
+          {logoutLoading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+          ) : (
+            <>
+              <i className="bi bi-box-arrow-right"></i>
+            </>
+          )}
+        </button>
       </header>
 
       {/* Main Content */}
