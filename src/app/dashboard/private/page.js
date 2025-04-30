@@ -147,17 +147,17 @@ export default function PrivatePosts() {
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-900 min-h-screen">
 
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 bg-gray-900 sticky top-0 z-10 py-2">
         <button
           onClick={handleBack}
-          className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
+          className="bg-gray-800 text-gray-300 px-2 py-1 rounded shadow-lg hover:bg-gray-700 transition duration-200"
         >
           Back
         </button>
 
         <button
           onClick={() => setIsSearchVisible(!isSearchVisible)}
-          className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200 flex items-center gap-2"
+          className="bg-gray-800 text-gray-300 px-2 py-1 rounded shadow-lg hover:bg-gray-700 transition duration-200 flex items-center gap-2"
         >
           <i className={`bi ${isSearchVisible ? "bi-x" : "bi-search"}`}></i>
           {isSearchVisible ? "Close" : "Search"}
@@ -214,13 +214,13 @@ export default function PrivatePosts() {
                 <div className="absolute w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20">
                   <ul>
                     <li
-                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 ${searchField === 'title' ? 'bg-indigo-900 text-indigo-300' : ''}`}
+                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 text-gray-300 ${searchField === 'title' ? 'bg-indigo-900 text-indigo-300' : ''}`}
                       onClick={() => selectSearchField('title')}
                     >
                       Title
                     </li>
                     <li
-                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 ${searchField === 'content' ? 'bg-indigo-900 text-indigo-300' : ''}`}
+                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 text-gray-300 ${searchField === 'content' ? 'bg-indigo-900 text-indigo-300' : ''}`}
                       onClick={() => selectSearchField('content')}
                     >
                       Content
