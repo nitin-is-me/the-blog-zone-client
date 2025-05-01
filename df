@@ -1,0 +1,71 @@
+Nitin (69):
+      Initial commit
+      Added comments
+      ui improvement
+      code formatting
+      yo
+      changed server url
+      changed signup flow
+      Added comments
+      Dark mode
+      Mobile friendly
+      Color adjustment
+      color adjustment
+      changed text
+      Added edit feature
+      Added loading icon on edit page
+      Fixed posts fetching before userInfo
+      Added github link
+      UI changes
+      Improved error handling
+      Switched from mongodb to postgres
+      Added confirmation on delete
+      Changed time format from time ago to exact date and time format
+      Added eye icon on password
+      Update README.md
+      Update README.md
+      Update README.md
+      Create page.js
+      Update page.js
+      Update page.js
+      Update page.js
+      Update page.js
+      Update README.md
+      Update page.js
+      Update page.js
+      Update page.js
+      Update page.js
+      Update README.md
+      Update page.js
+      Update README.md
+      Update README.md
+      Update README.md
+      Update README.md
+      Update README.md
+      Update formatTime.js
+      Update page.js
+      Update page.js
+      Update README.md
+      Update README.md
+      Update page.js
+      Update page.js
+      Update page.js
+      Update README.md
+      Update README.md
+      Update README.md
+      Update README.md
+      Update README.md
+      Update page.js
+      Update page.js
+      Update page.js
+      Update README.md
+      Update README.md
+      Added search button & moved logout to profile page
+      Added search button & moved logout button to profile page
+      Added logout button
+      Update README.md
+      Update page.js
+      Added source code links
+      Removed: Made with love by Nitin
+      Added confirmation on logout
+

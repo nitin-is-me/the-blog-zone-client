@@ -49,6 +49,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |2.5      | **28-Apr-2025** | Added "Member since" in profile page. |
 |2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. Also added privacy encryption notice in blog create/edit page. |
 |2.7      | **30-Apr-2025** | Added search through title, content or author feature for private/public posts. Logout button is moved to profile page now. |
+|2.8      | **01-May-2025** | Removed "Made with love with Nitin", and added source code links in the website root. Also added confirmation on logout. |
 
 --------------
 ### Contribute to the project
