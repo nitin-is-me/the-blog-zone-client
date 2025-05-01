@@ -41,7 +41,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |1.7      | **09-Jan-2025** | Added my github link in dashboard page. |
 |1.8      | **13-Jan-2025** | Made some changes in UI. |
 |1.9      | **14-Jan-2025** | Improved error handling (the most irritating part). |
-|2.0      | **17-Jan-2025** | Migrated to PostgreSQL, ditched MongoDB. Scaling is efficient now. I could migrate the existing posts and accounts, but i preferred to start clean and new. |
+|2.0      | **17-Jan-2025** | Big Update: Migrated to PostgreSQL, ditched MongoDB. Scaling is efficient now. I could migrate the existing posts and accounts, but i preferred to start clean and new. |
 |2.1      | **04-Mar-2025** | Added confirmation on post and comment deletion. |
 |2.2      | **10-Mar-2025** | Switched from <time>ago format to exact <date>,<time> format. It's better when you want to know the exact date and time of writing that post. |
 |2.3      | **29-Mar-2025** | Added eye icon on password. How could I forget this lol, my friend pointed that out. |
