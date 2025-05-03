@@ -37,7 +37,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |1.3      | **27-Dec-2024** | Changed website's theme from light to dark mode. |
 |1.4      | **28-Dec-2024** | Changed theme's colors and made the website mobile friendly by adding screen responsiveness. |
 |1.5      | **31-Dec-2024** | Changed some text labels, like: Username (must be unique). |
-|1.6      | **06-Jan-2025** | Added edit feature, missing loading icons in some pages. Also fixed posts fetching before/after user information, resulting in posts being blank while information is loaded and vice versa. |
+|1.6      | **06-Jan-2025** | Added edit feature, missing loading icons in some pages. Fixed Bug: Posts fetching before/after user information, resulting in posts being blank while information is loaded and vice versa. |
 |1.7      | **09-Jan-2025** | Added my github link in dashboard page. |
 |1.8      | **13-Jan-2025** | Made some changes in UI. |
 |1.9      | **14-Jan-2025** | Improved error handling (the most irritating part). |
@@ -50,6 +50,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |2.6      | **29-Apr-2025** | Big Update: Added content encryption for title and content in private posts. Original content will be replaced by random letters and numbers before saving to database, and will be decrypted only if the author tries to access. Now you can't share a private post with URL, it's securely only yours. Also added privacy encryption notice in blog create/edit page. |
 |2.7      | **30-Apr-2025** | Added search through title, content or author feature for private/public posts. Logout button is moved to profile page now. |
 |2.8      | **01-May-2025** | Removed "Made with love with Nitin", and added source code links in the website root. Also added confirmation on logout. |
+|2.9      | **03-May-2025** | Fixed Bug: User information loading after loading icon, leading to "Delete" showing late on own comment. |
 
 --------------
 ### Contribute to the project
