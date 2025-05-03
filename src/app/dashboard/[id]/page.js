@@ -6,7 +6,9 @@ import { formatTimeAgo } from "../../utils/formatTime";
 
 export default function BlogPostPage() {
   const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
+ // const [loading, setLoading] = useState(true);
+  const [postLoading, setPostLoading] = useState(true);
+  const [userLoading, setUserLoading] = useState(true);
   const [error, setError] = useState("");
   const [Comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -28,7 +30,7 @@ export default function BlogPostPage() {
       } catch (error) {
         setError("Failed to fetch the blog post.");
       } finally {
-        setLoading(false);
+        setPostLoading(false);
       }
     };
 
@@ -45,6 +47,8 @@ export default function BlogPostPage() {
           setLoggedInUser(response.data);
         } catch (error) {
           console.error("Failed to fetch user data.");
+        } finally {
+          setUserLoading(false);
         }
       }
     };
@@ -52,6 +56,8 @@ export default function BlogPostPage() {
     fetchPost();
     fetchLoggedInUser();
   }, [id]);
+
+  let overallLoading = postLoading || userLoading;
 
   const handleBack = () => {
     router.push("/dashboard");
@@ -121,7 +127,7 @@ export default function BlogPostPage() {
     }
   };
 
-  if (loading) {
+  if (overallLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-900">
         <div className="flex flex-col items-center">
