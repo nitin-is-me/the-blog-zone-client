@@ -271,7 +271,7 @@ export default function Dashboard() {
                 {/* Post Content */}
                <div className="min-w-0 flex-1">
   <h3 className="text-2xl font-semibold text-gray-300 mb-3 break-words">{post.title}</h3>
-  <p className="text-gray-400 mb-4 break-words leading-relaxed">{post.content.substring(0, 100)}...</p>
+  <p className="text-gray-400 mb-4 break-words">{post.content.substring(0, 100)}...</p>
   <p className="text-sm text-gray-500 break-words">
     By {post.Blogger.name}
   </p>
