@@ -269,20 +269,20 @@ export default function Dashboard() {
                 className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between overflow-hidden"
               >
                 {/* Post Content */}
-                <div className="min-w-0 flex-1">
-                  <h3 className="text-2xl font-semibold text-gray-300 mb-3 break-words hyphens-auto">{post.title}</h3>
-                  <p className="text-gray-400 mb-4 break-words hyphens-auto leading-relaxed">{post.content.substring(0, 100)}...</p>
-                  <p className="text-sm text-gray-500 break-words">
-                    By {post.Blogger.name}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
-                  <Link
-                    href={`/dashboard/${post.id}`}
-                    className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium break-words"
-                  >
-                    Read More
-                  </Link>
-                </div>
+               <div className="min-w-0 flex-1">
+  <h3 className="text-2xl font-semibold text-gray-300 mb-3 break-words">{post.title}</h3>
+  <p className="text-gray-400 mb-4 break-all leading-relaxed">{post.content.substring(0, 100)}...</p>
+  <p className="text-sm text-gray-500 break-words">
+    By {post.Blogger.name}
+  </p>
+  <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+  <Link
+    href={`/dashboard/${post.id}`}
+    className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
+  >
+    Read More
+  </Link>
+</div>
 
                 {/* Edit Button */}
                 {currentUser?.username === post.Blogger.username && (
