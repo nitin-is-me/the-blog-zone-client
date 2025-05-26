@@ -87,9 +87,9 @@ export default function BlogPostPage() {
 
         {post && (
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold text-gray-100 mb-6">{post.title}</h1>
-            <p className="text-gray-400 mb-4 whitespace-pre-wrap">{post.content}</p>
-            <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+            <h1 className="text-3xl font-bold text-gray-100 mb-6 break-words">{post.title}</h1>
+            <p className="text-gray-400 mb-4 whitespace-pre-wrap break-words">{post.content}</p>
+            <p className="text-xs text-gray-500 mt-2 break-words">{formatTimeAgo(post.createdAt)}</p>
           </div>
         )}
 
