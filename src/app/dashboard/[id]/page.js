@@ -154,8 +154,8 @@ export default function BlogPostPage() {
 
         {post && (
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold text-gray-100 mb-6">{post.title}</h1>
-            <p className="text-gray-400 mb-4 whitespace-pre-wrap">{post.content}</p>
+            <h1 className="text-3xl font-bold text-gray-100 mb-6 break-words">{post.title}</h1>
+            <p className="text-gray-400 mb-4 whitespace-pre-wrap break-words">{post.content}</p>
             <p className="text-sm text-gray-500">By {post.Blogger.name}</p>
             <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
           </div>
@@ -188,7 +188,7 @@ export default function BlogPostPage() {
               Comments.map((comment) => (
                 <div key={comment.id} className="p-4 rounded-lg bg-gray-800 flex flex-col justify-between">
                   <div>
-                    <p className="text-gray-300">{comment.content}</p>
+                    <p className="text-gray-300 break-words">{comment.content}</p>
                     <p className="text-xs text-gray-500 mt-1">
                       By {comment.Blogger?.name || "anonymous"} &middot;{" "}
                       {formatTimeAgo(comment.createdAt)}
