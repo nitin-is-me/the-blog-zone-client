@@ -266,19 +266,19 @@ export default function Dashboard() {
             filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between"
+                className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between overflow-hidden"
               >
                 {/* Post Content */}
-                <div>
-                  <h3 className="text-2xl font-semibold text-gray-300 mb-3">{post.title}</h3>
-                  <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
-                  <p className="text-sm text-gray-500">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-2xl font-semibold text-gray-300 mb-3 break-words hyphens-auto">{post.title}</h3>
+                  <p className="text-gray-400 mb-4 break-words hyphens-auto leading-relaxed">{post.content.substring(0, 100)}...</p>
+                  <p className="text-sm text-gray-500 break-words">
                     By {post.Blogger.name}
                   </p>
                   <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
                   <Link
                     href={`/dashboard/${post.id}`}
-                    className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
+                    className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium break-words"
                   >
                     Read More
                   </Link>
@@ -286,17 +286,17 @@ export default function Dashboard() {
 
                 {/* Edit Button */}
                 {currentUser?.username === post.Blogger.username && (
-                  <div className="absolute bottom-4 right-4 flex gap-6">
+                  <div className="absolute bottom-4 right-4 flex gap-6 flex-shrink-0">
                     <button
                       onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
-                      className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
+                      className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200 whitespace-nowrap"
                     >
                       Edit
                     </button>
                     {/* Delete Button */}
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="text-red-500 shadow-md hover:text-red-700 transition duration-200"
+                      className="text-red-500 shadow-md hover:text-red-700 transition duration-200 whitespace-nowrap"
                       disabled={deletingPostId === post.id}
                     >
                       {deletingPostId === post.id ? "Deleting..." : "Delete"}
@@ -307,7 +307,7 @@ export default function Dashboard() {
             ))
           ) : (
             <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-8 text-gray-400">
-              <p className="text-lg">No posts found matching your search.</p>
+              <p className="text-lg break-words">No posts found matching your search.</p>
               <button
                 onClick={() => setSearchQuery("")}
                 className="mt-4 text-indigo-500 hover:text-indigo-400"
