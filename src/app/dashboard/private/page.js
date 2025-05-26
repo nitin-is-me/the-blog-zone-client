@@ -258,8 +258,8 @@ export default function PrivatePosts() {
         ) : (
           filteredPosts.map((post) => (
             <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
-              <h2 className="text-2xl font-semibold text-gray-300 mb-4">{post.title}</h2>
-              <p className="text-gray-400 mb-4">{post.content.substring(0, 100)}...</p>
+              <h2 className="text-2xl font-semibold text-gray-300 mb-3 break-words">{post.title}</h2>
+              <p className="text-gray-400 mb-4 break-words">{post.content.substring(0, 100)}...</p>
               <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
 
               <Link
