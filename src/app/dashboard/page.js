@@ -148,7 +148,11 @@ export default function Dashboard() {
           >
             <i className="bi bi-person-circle text-2xl"></i>
           </Link>
+          <Link
+            href="/"
+          >
           <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">The Blog Zone</h1>
+          </Link>
         </div>
         <div className="flex gap-2 sm:gap-4">
 
