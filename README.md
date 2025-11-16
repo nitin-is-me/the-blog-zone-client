@@ -51,6 +51,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |2.7      | **30-Apr-2025** | Added search through title, content or author feature for private/public posts. Logout button is moved to profile page now. |
 |2.8      | **01-May-2025** | Removed "Made with love with Nitin", and added source code links in the website root. Also added confirmation on logout. |
 |2.9      | **03-May-2025** | Fixed Bug: User information loading after loading icon, leading to "Delete" showing late on own comment. |
+|3.0      | **16-Nov-2025** | Add Link component for blog title in dashboard. |
 
 --------------
 ### Contribute to the project
