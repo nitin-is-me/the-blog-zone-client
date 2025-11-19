@@ -120,7 +120,7 @@ export default function LoginPage() {
         </p>
         <p className="mt-2 text-center text-gray-500 text-sm">
           Forgot your password? Since this is an anonymous platform and I don't collect email or phone numbers, 
-          you can't reset it yourself. Please contact the <a href="mailto:nitinjha2609@gmail.com">admin</a> for password recovery.
+          you can't reset it yourself. Please contact the <a className="text-indigo-500 hover:text-indigo-400" href="mailto:nitinjha2609@gmail.com">admin</a> for password recovery.
         </p>
    
       </div>
