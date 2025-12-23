@@ -53,6 +53,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |2.9      | **03-May-2025** | Fixed Bug: User information loading after loading icon, leading to "Delete" showing late on own comment. |
 |3.0      | **16-Nov-2025** | Added Link component for blog title in dashboard. |
 |3.1      | **19-Nov-2025** | Added password recovery instructions in the login page (it looks a bit cluttered but it was necessary). |
+|3.2      | **23-Dec-2025** | Edited description and added google-site-verification code (hoping my site appears under google results lol). |
 
 --------------
 ### Contribute to the project
