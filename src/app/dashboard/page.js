@@ -333,8 +333,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Dashboard",
-  description: "Dashboard to view and manage all public posts",
-};

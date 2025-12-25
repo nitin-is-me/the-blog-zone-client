@@ -149,8 +149,3 @@ export default function CreateBlogPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Create Blog",
-  description: "Create your private or public post",
-};

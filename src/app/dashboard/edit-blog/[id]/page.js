@@ -188,8 +188,3 @@ export default function EditBlogPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Edit Blog",
-  description: "Edit your private or public post",
-};

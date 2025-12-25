@@ -293,8 +293,3 @@ export default function PrivatePosts() {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Private Dashboard",
-  description: "Dashboard to view and manage all private posts",
-};
