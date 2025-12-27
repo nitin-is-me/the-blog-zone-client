@@ -286,7 +286,7 @@ export default function Dashboard() {
                   </p>
                 </CardContent>
                 <CardFooter className="pt-0 flex items-center justify-between border-t bg-muted/10 p-4">
-                  <Button variant="default" size="sm" asChild className="rounded-full px-4">
+                  <Button variant="default" size="sm" asChild className="rounded-full px-4 bg-purple-800 hover:bg-purple-900 text-white">
                     <Link href={`/dashboard/${post.id}`}>
                       Read Article
                     </Link>
@@ -302,7 +302,7 @@ export default function Dashboard() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="text-red-500 hover:text-red-600 hover:bg-destructive/10"
                             disabled={deletingPostId === post.id}
                           >
                             {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}

@@ -267,16 +267,18 @@ export default function PrivatePosts() {
                   </p>
                 </CardContent>
                 <CardFooter className="pt-0 flex justify-between items-center bg-muted/20 px-6 py-4 mt-auto">
-                  <Link href={`/dashboard/private/${post.id}`} className="text-sm font-medium text-primary hover:underline">
-                    Read full post
-                  </Link>
+                  <Button variant="default" size="sm" asChild className="rounded-full px-4 bg-purple-800 hover:bg-purple-900 text-white">
+                    <Link href={`/dashboard/${post.id}`}>
+                      Read Article
+                    </Link>
+                  </Button>
 
                   {currentUser?.username === post.Blogger.username && (
                     <div className="flex items-center gap-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                        // className="h-8 px-2 text-muted-foreground hover:text-foreground"
                         onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
                       >
                         Edit
@@ -286,7 +288,7 @@ export default function PrivatePosts() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-8 px-2 text-destructive hover:bg-destructive/10"
+                            className="text-red-500 hover:text-red-600 hover:bg-destructive/10"
                             disabled={deletingPostId === post.id}
                           >
                             {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
