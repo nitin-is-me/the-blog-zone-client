@@ -4,148 +4,174 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowLeft, Loader2, ShieldAlert } from "lucide-react";
+import { toast } from 'sonner';
 
 export default function CreateBlogPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // Track the submission process
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleBack = () => {
-    router.push("/dashboard"); // Navigate back to the previous page
+    router.push("/dashboard");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
 
     try {
       const token = localStorage.getItem('token');
       if (!token) {
         setError('You must be logged in to create a post.');
+        toast.error('You must be logged in to create a post.');
+        setIsSubmitting(false);
         return;
       }
 
-      setIsSubmitting(true); // Set submitting state to true
-
-      const response = await axios.post(
+      await axios.post(
         'https://the-blog-zone-server.vercel.app/api/blog/create',
         { title, content, private: isPrivate },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // attaching token because the API requires it
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       setTitle('');
       setContent('');
-      setError('');
-      router.push('/dashboard'); // Redirect after success
+      toast.success("Blog post created successfully!");
+      router.push('/dashboard');
     } catch (error) {
-      setError('Failed to create blog post.');
+      const errorMsg = 'Failed to create blog post.';
+      setError(errorMsg);
+      toast.error(errorMsg);
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300">
-      <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
-        <div className="flex justify-between items-center mb-6">
-          <button
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-3xl shadow-lg border-none bg-card/50 backdrop-blur-sm">
+        <CardHeader className="space-y-1 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-6 top-6 gap-2 text-muted-foreground hover:text-foreground"
             onClick={handleBack}
-            className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
           >
-            Back
-          </button>
-        </div>
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+          <CardTitle className="text-3xl font-bold text-center pt-8">Create New Post</CardTitle>
+          <CardDescription className="text-center">
+            Share your thoughts with the world
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form id="create-post-form" onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md text-center">
+                {error}
+              </div>
+            )}
 
-        <h2 className="text-2xl font-bold text-center mb-6">Create a New Blog Post</h2>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        {success && <p className="text-green-500 mb-4">{success}</p>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Content</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
-              rows="5"
-              required
-            ></textarea>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Privacy</label>
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value={false}
-                  checked={!isPrivate}
-                  onChange={() => setIsPrivate(false)}
-                  className="mr-2"
-                />
-                Public
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value={true}
-                  checked={isPrivate}
-                  onChange={() => setIsPrivate(true)}
-                  className="mr-2"
-                />
-                Private
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-lg">Title</Label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="Enter an engaging title..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="text-lg font-medium"
+              />
             </div>
 
-            {/* Privacy encryption notice */}
-            <div className="mt-2 text-xs text-indigo-400 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>
-                Private posts will be securely encrypted from now. {' '}
+            <div className="space-y-2">
+              <Label htmlFor="content" className="text-lg">Content</Label>
+              <Textarea
+                id="content"
+                placeholder="Write your story here..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="min-h-[300px] text-base leading-relaxed resize-y"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-lg bg-muted/50 border">
+              <div className="space-y-0.5">
+                <Label className="text-base font-semibold text-foreground">Private Post</Label>
+                <p className="text-sm text-muted-foreground">
+                  Only you will be able to see this post.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={isPrivate}
+                  onCheckedChange={setIsPrivate}
+                  disabled={isSubmitting}
+                />
+                <span className="text-sm font-medium">
+                  {isPrivate ? "Private" : "Public"}
+                </span>
+              </div>
+            </div>
+
+            {/* Encryption Notice */}
+            <div className="flex items-start gap-2 text-xs text-muted-foreground bg-blue-500/10 p-3 rounded text-indigo-400">
+              <ShieldAlert className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div>
+                Private posts are securely encrypted. {' '}
                 <Link
                   href="https://github.com/nitin-is-me/the-blog-zone-client/blob/master/README.md#private-posts-will-be-encrypted"
-                  className="underline hover:text-indigo-300 transition-colors"
+                  className="underline hover:text-primary transition-colors"
                   target='_blank'
                   rel='noopener noreferrer'>
-                  Learn more
+                  Learn more about our security.
                 </Link>
-              </span>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white p-2 rounded flex justify-center items-center hover:bg-indigo-700 transition duration-200"
-            disabled={isSubmitting}
-          >
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-4 border-t p-6">
+          <Button variant="outline" onClick={handleBack} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button type="submit" form="create-post-form" disabled={isSubmitting} className="min-w-[120px]">
             {isSubmitting ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white border-opacity-70"></div>
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Publishing...
+              </>
             ) : (
-              "Create Post"
+              "Publish Post"
             )}
-          </button>
-        </form>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

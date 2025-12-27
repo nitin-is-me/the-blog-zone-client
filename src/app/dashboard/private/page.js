@@ -4,6 +4,23 @@ import axios from "axios";
 import Link from "next/link";
 import { formatTimeAgo } from "../../utils/formatTime";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Search, ChevronDown, ArrowLeft, X, Loader2, Calendar, Lock } from "lucide-react";
+import { toast } from "sonner";
 
 export default function PrivatePosts() {
 
@@ -18,7 +35,6 @@ export default function PrivatePosts() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("title");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const router = useRouter();
 
@@ -32,7 +48,7 @@ export default function PrivatePosts() {
               Authorization: `Bearer ${token}`,
             },
           });
-          setCurrentUser(response.data); // the server returns user details
+          setCurrentUser(response.data);
         } catch (error) {
           console.error("Failed to fetch user info:", error);
         }
@@ -43,7 +59,9 @@ export default function PrivatePosts() {
       const token = localStorage.getItem("token");
       if (!token) {
         setLoading(false);
-        return setError("You must be logged in to see your private posts");
+        setError("You must be logged in to see your private posts");
+        toast.error("You must be logged in to see your private posts");
+        return;
       }
       try {
         const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog/blogs/private", {
@@ -52,9 +70,11 @@ export default function PrivatePosts() {
           },
         });
         setPosts(response.data);
-        setFilteredPosts(response.data); // Initialize filtered posts with all posts
+        setFilteredPosts(response.data);
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch private posts.");
+        const errorMsg = error.response?.data?.message || "Failed to fetch private posts.";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -64,7 +84,7 @@ export default function PrivatePosts() {
     fetchPrivatePosts();
   }, []);
 
-  // Filter posts based on search query and field
+  // filter posts based on search query and field
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredPosts(posts);
@@ -86,7 +106,7 @@ export default function PrivatePosts() {
     setFilteredPosts(filtered);
   }, [searchQuery, searchField, posts]);
 
-  // Reset search query when search panel is closed
+  // reset search query when search panel is closed
   useEffect(() => {
     if (!isSearchVisible) {
       setSearchQuery("");
@@ -94,14 +114,12 @@ export default function PrivatePosts() {
   }, [isSearchVisible]);
 
   const handleBack = () => {
-    router.push("/dashboard"); // Navigate back to the previous page
+    router.push("/dashboard");
   };
 
   const handleDelete = async (postId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this post?");
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     setDeletingPostId(postId);
     const token = localStorage.getItem("token");
@@ -113,183 +131,163 @@ export default function PrivatePosts() {
       });
       const updatedPosts = posts.filter((post) => post.id !== postId);
       setPosts(updatedPosts);
-      setFilteredPosts(updatedPosts); // Update filtered posts as well
+      setFilteredPosts(updatedPosts);
+      toast.success("Post deleted successfully.");
     } catch (error) {
       console.error("Failed to delete post:", error);
       setError("Could not delete the post. Try again.");
+      toast.error("Could not delete the post. Try again.");
     } finally {
       setDeletingPostId(null);
     }
   };
 
-  // Toggle dropdown
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  // Handle field selection
-  const selectSearchField = (field) => {
-    setSearchField(field);
-    setIsDropdownOpen(false);
-  };
-
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-300">Loading private posts...</p>
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground font-medium">Loading private posts...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-gray-900 min-h-screen">
-
-      <div className="flex justify-between items-center mb-6 bg-gray-900 sticky top-0 z-10 py-2">
-        <button
-          onClick={handleBack}
-          className="bg-gray-800 text-gray-300 px-2 py-1 rounded shadow-lg hover:bg-gray-700 transition duration-200"
-        >
-          Back
-        </button>
-
-        <button
-          onClick={() => setIsSearchVisible(!isSearchVisible)}
-          className="bg-gray-800 text-gray-300 px-2 py-1 rounded shadow-lg hover:bg-gray-700 transition duration-200 flex items-center gap-2"
-        >
-          <i className={`bi ${isSearchVisible ? "bi-x" : "bi-search"}`}></i>
-          {isSearchVisible ? "Close" : "Search"}
-        </button>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-semibold text-gray-200">My Private Posts</h1>
-      </div>
-
-      {/* Search Section - Collapsible */}
-      {isSearchVisible && (
-        <section className="mb-8 animate-fade-in">
-          <div className="flex flex-col sm:flex-row gap-4 items-center">
-            <div className="relative w-full sm:w-3/4">
-              <input
-                type="text"
-                placeholder="Search your private posts..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-4 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                autoFocus
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-300"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            {/* Combobox for selecting search field - only title and content */}
-            <div className="relative w-full sm:w-1/4">
-              <button
-                onClick={toggleDropdown}
-                className="w-full flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg py-2 px-4 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <span className="capitalize">
-                  {searchField === "title" ? "Title" : "Content"}
-                </span>
-                <svg
-                  className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-
-              {isDropdownOpen && (
-                <div className="absolute w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20">
-                  <ul>
-                    <li
-                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 text-gray-300 ${searchField === 'title' ? 'bg-indigo-900 text-indigo-300' : ''}`}
-                      onClick={() => selectSearchField('title')}
-                    >
-                      Title
-                    </li>
-                    <li
-                      className={`py-2 px-4 cursor-pointer hover:bg-gray-700 text-gray-300 ${searchField === 'content' ? 'bg-indigo-900 text-indigo-300' : ''}`}
-                      onClick={() => selectSearchField('content')}
-                    >
-                      Content
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={handleBack}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className="text-xl font-bold flex items-center gap-2">
+              <Lock className="h-5 w-5 text-primary" />
+              My Private Posts
+            </h1>
           </div>
 
-          {/* Search results counter */}
-          <div className="mt-4 text-sm text-gray-400">
-            {searchQuery ? `Found ${filteredPosts.length} post${filteredPosts.length !== 1 ? 's' : ''}` : ''}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSearchVisible(!isSearchVisible)}
+            className={isSearchVisible ? "bg-accent" : ""}
+          >
+            <Search className="h-5 w-5 mr-2" />
+            {isSearchVisible ? "Close Search" : "Search"}
+          </Button>
+        </div>
+
+        {isSearchVisible && (
+          <div className="border-t bg-muted/30 px-4 py-4 animate-in slide-in-from-top-2">
+            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder={`Search by ${searchField}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                  autoFocus
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-[140px] justify-between">
+                    <span className="capitalize">{searchField}</span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setSearchField("title")}>Title</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchField("content")}>Content</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <div className="max-w-3xl mx-auto mt-2 text-xs text-muted-foreground">
+              {searchQuery ? `Found ${filteredPosts.length} results` : ""}
+            </div>
           </div>
-        </section>
-      )}
+        )}
+      </header>
 
-      {error && <p className="text-red-500">{error}</p>}
+      <main className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        {error && (
+          <div className="p-4 mb-6 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 text-center">
+            {error}
+          </div>
+        )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredPosts.length === 0 ? (
-          searchQuery ? (
-            <p className="text-gray-400 text-center col-span-full">
-              No posts found matching your search.
-              <button
-                onClick={() => setSearchQuery("")}
-                className="ml-2 text-indigo-500 hover:text-indigo-400"
-              >
-                Clear search
-              </button>
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredPosts.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-muted-foreground space-y-4">
+              <div className="bg-muted/50 p-4 rounded-full">
+                <Lock className="h-8 w-8 opacity-50" />
+              </div>
+              {searchQuery ? (
+                <p>No private posts found matching "{searchQuery}"</p>
+              ) : (
+                <p>You haven't created any private posts yet.</p>
+              )}
+            </div>
           ) : (
-            <p className="text-gray-400 text-center col-span-full">No private posts, create one!</p>
-          )
-        ) : (
-          filteredPosts.map((post) => (
-            <div key={post.id} className="bg-gray-800 p-6 rounded-lg shadow-lg relative">
-              <h2 className="text-2xl font-semibold text-gray-300 mb-3 break-words">{post.title}</h2>
-              <p className="text-gray-400 mb-4 break-words">{post.content.substring(0, 100)}...</p>
-              <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
+            filteredPosts.map((post) => (
+              <Card key={post.id} className="flex flex-col overflow-hidden border-muted hover:shadow-lg transition-all hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-xl font-bold line-clamp-2 leading-tight">
+                    {post.title}
+                  </CardTitle>
+                  <div className="flex items-center text-xs text-muted-foreground mt-2">
+                    <Calendar className="mr-1 h-3 w-3" />
+                    <span>{formatTimeAgo(post.createdAt)}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-grow pb-4">
+                  <p className="text-muted-foreground text-sm line-clamp-3">
+                    {post.content}
+                  </p>
+                </CardContent>
+                <CardFooter className="pt-0 flex justify-between items-center bg-muted/20 px-6 py-4 mt-auto">
+                  <Link href={`/dashboard/private/${post.id}`} className="text-sm font-medium text-primary hover:underline">
+                    Read full post
+                  </Link>
 
-              <Link
-                href={`/dashboard/private/${post.id}`}
-                className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
-              >
-                Read More
-              </Link>
-
-              {/* Edit Button */}
-              {currentUser?.username === post.Blogger.username && (
-                <div className="absolute bottom-4 right-4 flex gap-6">
-                  <button
-                    onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
-                    className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="text-red-500 shadow-md hover:text-red-700 transition duration-200"
-                    disabled={deletingPostId === post.id}
-                  >
-                    {deletingPostId === post.id ? "Deleting..." : "Delete"}
-                  </button>
-                </div>
-              )}
-            </div>
-          )))}
-      </div>
+                  {currentUser?.username === post.Blogger.username && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-destructive hover:bg-destructive/10"
+                        onClick={() => handleDelete(post.id)}
+                        disabled={deletingPostId === post.id}
+                      >
+                        {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                      </Button>
+                    </div>
+                  )}
+                </CardFooter>
+              </Card>
+            ))
+          )}
+        </div>
+      </main>
     </div>
   );
 }

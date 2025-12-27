@@ -4,6 +4,21 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ArrowLeft, Loader2, ShieldAlert } from "lucide-react";
+import { toast } from 'sonner';
 
 export default function EditBlogPage() {
   const [title, setTitle] = useState('');
@@ -21,7 +36,9 @@ export default function EditBlogPage() {
       const token = localStorage.getItem("token");
       if (!token) {
         setLoading(false);
-        return setError("You must be logged in to edit post");
+        setError("You must be logged in to edit post");
+        toast.error("You must be logged in to edit post");
+        return;
       }
 
       try {
@@ -34,10 +51,10 @@ export default function EditBlogPage() {
         setTitle(post.title);
         setContent(post.content);
         setIsPrivate(post.private);
-        setLoading(false);
       } catch (error) {
-        setError(error.response?.data?.message || 'Failed to fetch post details.');
-        setLoading(false);
+        const errorMsg = error.response?.data?.message || 'Failed to fetch post details.';
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -47,7 +64,7 @@ export default function EditBlogPage() {
   }, [id]);
 
   const handleBack = () => {
-    router.push('/dashboard'); // Navigate back to the dashboard
+    router.back();
   };
 
   const handleSubmit = async (e) => {
@@ -57,6 +74,7 @@ export default function EditBlogPage() {
       const token = localStorage.getItem('token');
       if (!token) {
         setError('You must be logged in to edit a post.');
+        toast.error('You must be logged in to edit a post.');
         return;
       }
 
@@ -72,119 +90,130 @@ export default function EditBlogPage() {
         }
       );
 
-      router.back();
+      toast.success("Post updated successfully!");
+      router.push('/dashboard');
     } catch (error) {
       setError('Failed to update the blog post.');
+      toast.error('Failed to update the blog post.');
       setIsSubmitting(false);
     }
   };
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-300">Loading edit page...</p>
+      <div className="flex justify-center items-center min-h-screen bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <p className="text-muted-foreground font-medium">Loading post...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300">
-      <div className="max-w-4xl mx-auto p-6 bg-gray-900 rounded-lg shadow-lg">
-        <div className="flex justify-between items-center mb-6">
-          <button
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-3xl shadow-lg border-none bg-card/50 backdrop-blur-sm">
+        <CardHeader className="space-y-1 relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="absolute left-6 top-6 gap-2 text-muted-foreground hover:text-foreground"
             onClick={handleBack}
-            className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
           >
-            Back
-          </button>
-        </div>
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Button>
+          <CardTitle className="text-3xl font-bold text-center pt-8">Edit Post</CardTitle>
+          <CardDescription className="text-center">
+            Make changes to your story
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form id="edit-post-form" onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md text-center">
+                {error}
+              </div>
+            )}
 
-        <h2 className="text-2xl font-bold text-center mb-6">Edit Blog Post</h2>
-
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium mb-2">Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
-              required
-            />
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Content</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full p-2 border border-gray-700 rounded bg-gray-800 text-gray-300 focus:outline-none focus:ring focus:ring-indigo-500"
-              rows="5"
-              required
-            ></textarea>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium mb-2">Privacy</label>
-            <div className="flex items-center space-x-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value={false}
-                  checked={!isPrivate}
-                  onChange={() => setIsPrivate(false)}
-                  className="mr-2"
-                />
-                Public
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value={true}
-                  checked={isPrivate}
-                  onChange={() => setIsPrivate(true)}
-                  className="mr-2"
-                />
-                Private
-              </label>
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-lg">Title</Label>
+              <Input
+                id="title"
+                type="text"
+                placeholder="Enter an engaging title..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="text-lg font-medium"
+              />
             </div>
 
-            {/* Privacy encryption notice */}
-            <div className="mt-2 text-xs text-indigo-400 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>
-                Private posts will be securely encrypted from now. {' '}
+            <div className="space-y-2">
+              <Label htmlFor="content" className="text-lg">Content</Label>
+              <Textarea
+                id="content"
+                placeholder="Write your story here..."
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                required
+                disabled={isSubmitting}
+                className="min-h-[300px] text-base leading-relaxed resize-y"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-lg bg-muted/50 border">
+              <div className="space-y-0.5">
+                <Label className="text-base font-semibold text-foreground">Private Post</Label>
+                <p className="text-sm text-muted-foreground">
+                  Only you will be able to see this post.
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={isPrivate}
+                  onCheckedChange={setIsPrivate}
+                  disabled={isSubmitting}
+                />
+                <span className="text-sm font-medium">
+                  {isPrivate ? "Private" : "Public"}
+                </span>
+              </div>
+            </div>
+
+            {/* notice for encryption of private posts */}
+            <div className="flex items-start gap-2 text-xs text-muted-foreground bg-blue-500/10 p-3 rounded text-indigo-400">
+              <ShieldAlert className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <div>
+                Private posts are securely encrypted. {' '}
                 <Link
                   href="https://github.com/nitin-is-me/the-blog-zone-client/blob/master/README.md#private-posts-will-be-encrypted"
-                  className="underline hover:text-indigo-300 transition-colors"
+                  className="underline hover:text-primary transition-colors"
                   target='_blank'
                   rel='noopener noreferrer'>
-                  Learn more
+                  Learn more.
                 </Link>
-              </span>
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white p-2 rounded flex justify-center items-center hover:bg-indigo-700 transition duration-200"
-            disabled={isSubmitting}
-          >
+          </form>
+        </CardContent>
+        <CardFooter className="flex justify-end gap-4 border-t p-6">
+          <Button variant="outline" onClick={handleBack} disabled={isSubmitting}>
+            Cancel
+          </Button>
+          <Button type="submit" form="edit-post-form" disabled={isSubmitting} className="min-w-[120px]">
             {isSubmitting ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-4 border-white"></div>
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
             ) : (
-              'Update Post'
+              "Save Changes"
             )}
-          </button>
-        </form>
-      </div>
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

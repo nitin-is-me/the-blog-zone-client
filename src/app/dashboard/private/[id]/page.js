@@ -3,6 +3,15 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import axios from "axios";
 import { formatTimeAgo } from "../../../utils/formatTime";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, User, Calendar, Lock, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 export default function BlogPostPage() {
   const [post, setPost] = useState(null);
@@ -19,7 +28,9 @@ export default function BlogPostPage() {
       const token = localStorage.getItem("token");
       if (!token) {
         setLoading(false);
-        return setError("You must be logged in to see this private post");
+        setError("You must be logged in to see this private post");
+        toast.error("You must be logged in to see this private post");
+        return;
       }
       try {
         const response = await axios.get(`https://the-blog-zone-server.vercel.app/api/blog/${id}`, {
@@ -29,13 +40,15 @@ export default function BlogPostPage() {
         });
         setPost(response.data);
       } catch (error) {
-        setError(error.response?.data?.message || "Failed to fetch the blog post.");
+        const errorMsg = error.response?.data?.message || "Failed to fetch the blog post.";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
     };
 
-    // Fetch the logged-in user details
+    // fetch the logged in user details
     const fetchLoggedInUser = async () => {
       const token = localStorage.getItem("token");
       if (token) {
@@ -62,37 +75,73 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-500 border-opacity-70"></div>
-          <p className="mt-4 text-gray-300">Loading post...</p>
-        </div>
+      <div className="min-h-screen bg-background p-6 flex flex-col items-center justify-center space-y-6">
+        <Skeleton className="h-10 w-3/4 max-w-2xl" />
+        <Skeleton className="h-6 w-1/2 max-w-lg" />
+        <Skeleton className="h-[300px] w-full max-w-4xl rounded-xl" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300">
-      <div className="max-w-4xl mx-auto p-6 bg-gray-900">
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={handleBack}
-            className="bg-gray-800 text-gray-300 px-4 py-2 rounded shadow-lg hover:bg-gray-700 transition duration-200"
-          >
-            Back
-          </button>
+    <div className="min-h-screen bg-background pb-12">
+      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-8">
+
+        <div className="flex items-center">
+          <Button variant="ghost" className="gap-2" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4" /> Back to Private Posts
+          </Button>
         </div>
 
-        {error && <p className="text-red-500">{error}</p>}
-
-        {post && (
-          <div className="bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h1 className="text-3xl font-bold text-gray-100 mb-6 break-words">{post.title}</h1>
-            <p className="text-gray-400 mb-4 whitespace-pre-wrap break-words">{post.content}</p>
-            <p className="text-xs text-gray-500 mt-2 break-words">{formatTimeAgo(post.createdAt)}</p>
+        {error && (
+          <div className="p-4 rounded-lg bg-destructive/10 text-destructive text-center border border-destructive/20 flex flex-col items-center gap-2">
+            <AlertTriangle className="h-6 w-6" />
+            <p>{error}</p>
           </div>
         )}
 
+        {post && (
+          <article className="space-y-6 animate-in fade-in duration-500">
+            {/* Privacy Badge */}
+            <div className="flex justify-center sm:justify-start">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                <Lock className="h-3 w-3" /> Private Post
+              </span>
+            </div>
+
+            {/* Post Header */}
+            <div className="space-y-4 text-center sm:text-left">
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+                {post.title}
+              </h1>
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-muted-foreground text-sm">
+                <div className="flex items-center gap-1">
+                  <User className="h-4 w-4" />
+                  <span className="font-medium text-foreground">{post.Blogger?.name || "You"}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatTimeAgo(post.createdAt)}</span>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Post Content */}
+            <Card className="border-none shadow-none bg-transparent">
+              <CardContent className="p-0 text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                {post.content}
+              </CardContent>
+            </Card>
+
+            <Separator className="my-8" />
+
+            <div className="text-center text-sm text-muted-foreground pb-8">
+              <p>This post is private and visible only to you.</p>
+            </div>
+          </article>
+        )}
       </div>
     </div>
   );

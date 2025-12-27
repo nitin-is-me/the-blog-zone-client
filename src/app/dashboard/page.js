@@ -4,9 +4,28 @@ import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { formatTimeAgo } from "../utils/formatTime";
+import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, ChevronDown, UserCircle, Plus, X, Lock, Menu, Filter, Trash2, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 export default function Dashboard() {
-
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,8 +37,11 @@ export default function Dashboard() {
   // Search states
   const [searchQuery, setSearchQuery] = useState("");
   const [searchField, setSearchField] = useState("title");
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  // Loading states
+  const [userLoading, setUserLoading] = useState(true);
+  const [postsLoading, setPostsLoading] = useState(true);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -44,9 +66,10 @@ export default function Dashboard() {
       try {
         const response = await axios.get("https://the-blog-zone-server.vercel.app/api/blog");
         setPosts(response.data);
-        setFilteredPosts(response.data); // Initialize filtered posts with all posts
+        setFilteredPosts(response.data);
       } catch (error) {
         setError("Failed to fetch blog posts.");
+        toast.error("Failed to fetch blog posts.");
       } finally {
         setPostsLoading(false);
       }
@@ -59,13 +82,8 @@ export default function Dashboard() {
     fetchPosts();
   }, []);
 
-  // Set overall loading state
-  const [userLoading, setUserLoading] = useState(true);
-  const [postsLoading, setPostsLoading] = useState(true);
-
   const overallLoading = userLoading || postsLoading;
 
-  // Filter posts based on search query and field
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredPosts(posts);
@@ -91,9 +109,7 @@ export default function Dashboard() {
 
   const handleDelete = async (postId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this post?");
-    if (!confirmDelete) {
-      return;
-    }
+    if (!confirmDelete) return;
 
     setDeletingPostId(postId);
     const token = localStorage.getItem("token");
@@ -105,231 +121,223 @@ export default function Dashboard() {
       });
       const updatedPosts = posts.filter((post) => post.id !== postId);
       setPosts(updatedPosts);
-      setFilteredPosts(updatedPosts); // Update filtered posts as well
+      setFilteredPosts(updatedPosts);
+      toast.success("Post deleted successfully.");
     } catch (error) {
       console.error("Failed to delete post:", error);
       setError("Could not delete the post. Try again.");
+      toast.error("Could not delete the post. Try again.");
     } finally {
       setDeletingPostId(null);
     }
   };
 
-
-  // Toggle dropdown
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  // Handle field selection
-  const selectSearchField = (field) => {
-    setSearchField(field);
-    setIsDropdownOpen(false);
-  };
-
   if (overallLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gray-900">
-        <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500"></div>
-          <p className="mt-4 text-gray-300 text-lg font-medium">Loading...</p>
+      <div className="min-h-screen bg-background p-6 space-y-6">
+        <div className="flex justify-between items-center mb-8">
+          <Skeleton className="h-8 w-32" />
+          <div className="flex gap-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Skeleton key={i} className="h-64 rounded-xl" />
+          ))}
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-300">
-      {/* Top Navigation */}
-      <header className="bg-gray-800 py-2 px-4 flex justify-between items-center shadow-md sticky top-0 z-10">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/profile"
-            className="text-gray-300 hover:text-indigo-400 transition duration-200"
-          >
-            <i className="bi bi-person-circle text-2xl"></i>
-          </Link>
-          <Link
-            href="/"
-          >
-          <h1 className="text-xl sm:text-2xl font-bold text-indigo-500">The Blog Zone</h1>
-          </Link>
+    <div className="min-h-screen bg-background transition-colors duration-300">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-8">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-2">
+              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">
+                The Blog Zone
+              </span>
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsSearchVisible(!isSearchVisible)}
+              className={isSearchVisible ? "bg-accent" : ""}
+            >
+              <Search className="h-5 w-5" />
+            </Button>
+
+            <Link href="/dashboard/private">
+              <Button variant="secondary" size="sm" className="hidden sm:flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                Private
+              </Button>
+              {/* mobile icon only */}
+              <Button variant="secondary" size="icon" className="sm:hidden">
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
+
+            <Link href="/profile">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <UserCircle className="h-6 w-6" />
+              </Button>
+            </Link>
+
+            <ModeToggle />
+          </div>
         </div>
-        <div className="flex gap-2 sm:gap-4">
 
-          <Link
-            href="/dashboard/private"
-            className="text-sm bg-indigo-600 px-3 py-1.5 rounded-full shadow hover:bg-indigo-700 transition duration-200"
-          >
-            Private
-          </Link>
-
-          <button
-            onClick={() => setIsSearchVisible(!isSearchVisible)}
-            className="bg-gray-800 text-gray-300 px-2 py-1 rounded shadow-lg hover:bg-gray-700 transition duration-200 flex items-center gap-2"
-          >
-            <i className={`bi ${isSearchVisible ? "bi-x" : "bi-search"}`}></i>
-            {isSearchVisible ? "Close" : "Search"}
-          </button>
-
-
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-6xl mx-auto p-6">
-        {/* Welcome Section */}
-        <section className="mb-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-200">Welcome, {currentUser?.name || "Guest"}!</h2>
-          <p className="text-lg text-gray-400 mt-2">
-            Explore the latest blog posts or share your thoughts with the community.
-          </p>
-        </section>
-
-        {/* Search Section - Collapsible */}
+        {/* search bar */}
         {isSearchVisible && (
-          <section className="mb-8 animate-fade-in">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <div className="relative w-full sm:w-3/4">
-                <input
-                  type="text"
+          <div className="border-t bg-muted/30 px-4 py-4 animate-in slide-in-from-top-2">
+            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
                   placeholder="Search posts..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 px-4 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="pl-9"
                   autoFocus
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-300"
+                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                   >
-                    ×
+                    <X className="h-4 w-4" />
                   </button>
                 )}
               </div>
-
-              {/* Combobox for selecting search field */}
-              <div className="relative w-full sm:w-1/4">
-                <button
-                  onClick={toggleDropdown}
-                  className="w-full flex items-center justify-between bg-gray-800 border border-gray-700 rounded-lg py-2 px-4 text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  <span className="capitalize">
-                    {searchField === "title" ? "Title" :
-                      searchField === "content" ? "Content" : "Author"}
-                  </span>
-                  <svg
-                    className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
-
-                {isDropdownOpen && (
-                  <div className="absolute w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-20">
-                    <ul>
-                      <li
-                        className={`py-2 px-4 cursor-pointer hover:bg-gray-700 ${searchField === 'title' ? 'bg-indigo-900 text-indigo-300' : ''}`}
-                        onClick={() => selectSearchField('title')}
-                      >
-                        Title
-                      </li>
-                      <li
-                        className={`py-2 px-4 cursor-pointer hover:bg-gray-700 ${searchField === 'content' ? 'bg-indigo-900 text-indigo-300' : ''}`}
-                        onClick={() => selectSearchField('content')}
-                      >
-                        Content
-                      </li>
-                      <li
-                        className={`py-2 px-4 cursor-pointer hover:bg-gray-700 ${searchField === 'author' ? 'bg-indigo-900 text-indigo-300' : ''}`}
-                        onClick={() => selectSearchField('author')}
-                      >
-                        Author
-                      </li>
-                    </ul>
-                  </div>
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full sm:w-[140px] justify-between">
+                    <span className="capitalize">{searchField}</span>
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => setSearchField("title")}>Title</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchField("content")}>Content</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setSearchField("author")}>Author</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-
-            {/* Search results counter */}
-            <div className="mt-4 text-sm text-gray-400">
-              {searchQuery ? `Found ${filteredPosts.length} post${filteredPosts.length !== 1 ? 's' : ''}` : ''}
+            <div className="max-w-3xl mx-auto mt-2 text-xs text-muted-foreground">
+              {searchQuery ? `Found ${filteredPosts.length} results` : ""}
             </div>
-          </section>
+          </div>
+        )}
+      </header>
+
+      {/* main */}
+      <main className="max-w-7xl mx-auto p-4 sm:p-8">
+        <div className="mb-10 text-center space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl text-foreground">
+            Welcome back, {currentUser?.name?.split(" ")[0]}
+          </h1>
+          <p className="text-lg text-muted-foreground">
+            Catch up on the latest stories or write your own.
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-6 p-4 rounded-lg bg-destructive/10 text-destructive text-center border border-destructive/20">
+            {error}
+          </div>
         )}
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        {/* Posts Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
-              <div
-                key={post.id}
-                className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-shadow duration-300 relative flex flex-col justify-between overflow-hidden"
-              >
-                {/* Post Content */}
-               <div className="min-w-0 flex-1">
-  <h3 className="text-2xl font-semibold text-gray-300 mb-3 break-words">{post.title}</h3>
-  <p className="text-gray-400 mb-4 break-words">{post.content.substring(0, 100)}...</p>
-  <p className="text-sm text-gray-500 break-words">
-    By {post.Blogger.name}
-  </p>
-  <p className="text-xs text-gray-500 mt-2">{formatTimeAgo(post.createdAt)}</p>
-  <Link
-    href={`/dashboard/${post.id}`}
-    className="text-indigo-500 hover:text-indigo-400 mt-4 inline-block font-medium"
-  >
-    Read More
-  </Link>
-</div>
-
-                {/* Edit Button */}
-                {currentUser?.username === post.Blogger.username && (
-                  <div className="absolute bottom-4 right-4 flex gap-6 flex-shrink-0">
-                    <button
-                      onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
-                      className="text-indigo-500 shadow-md hover:text-indigo-400 transition duration-200 whitespace-nowrap"
-                    >
-                      Edit
-                    </button>
-                    {/* Delete Button */}
-                    <button
-                      onClick={() => handleDelete(post.id)}
-                      className="text-red-500 shadow-md hover:text-red-700 transition duration-200 whitespace-nowrap"
-                      disabled={deletingPostId === post.id}
-                    >
-                      {deletingPostId === post.id ? "Deleting..." : "Delete"}
-                    </button>
+        {filteredPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredPosts.map((post) => (
+              <Card key={post.id} className="group relative flex flex-col overflow-hidden border-muted transition-all hover:shadow-xl hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start gap-4">
+                    <CardTitle className="text-xl font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                      {post.title}
+                    </CardTitle>
                   </div>
-                )}
-              </div>
-            ))
-          ) : (
-            <div className="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-8 text-gray-400">
-              <p className="text-lg break-words">No posts found matching your search.</p>
-              <button
-                onClick={() => setSearchQuery("")}
-                className="mt-4 text-indigo-500 hover:text-indigo-400"
-              >
-                Clear search
-              </button>
+                  <div className="flex items-center text-sm text-muted-foreground mt-2">
+                    <span className="font-medium text-foreground mr-2">{post.Blogger.name}</span>
+                    <span>• {formatTimeAgo(post.createdAt)}</span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-grow pb-4">
+                  <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">
+                    {post.content}
+                  </p>
+                </CardContent>
+                <CardFooter className="pt-0 flex items-center justify-between border-t bg-muted/10 p-4">
+                  <Button variant="default" size="sm" asChild className="rounded-full px-4">
+                    <Link href={`/dashboard/${post.id}`}>
+                      Read Article
+                    </Link>
+                  </Button>
+
+                  {currentUser?.username === post.Blogger.username && (
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(post.id)}
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        disabled={deletingPostId === post.id}
+                      >
+                        {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                      </Button>
+                    </div>
+                  )}
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-20 px-4 border-2 border-dashed border-muted rounded-xl bg-muted/5">
+            <div className="mx-auto h-12 w-12 text-muted-foreground flex items-center justify-center rounded-full bg-muted">
+              <Search className="h-6 w-6" />
             </div>
-          )}
-        </section>
+            <h3 className="mt-4 text-lg font-semibold text-foreground">No posts found</h3>
+            <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+              We couldn't find any posts matching your search. Try adjusting your filters or search terms.
+            </p>
+            <Button
+              variant="outline"
+              className="mt-6"
+              onClick={() => {
+                setSearchQuery("");
+                setSearchField("title");
+              }}
+            >
+              Clear Filters
+            </Button>
+          </div>
+        )}
       </main>
 
-      {/* Floating Action Button */}
-      <Link
-        href="/dashboard/create-blog"
-        className="fixed bottom-6 right-6 bg-indigo-600 text-white p-4 rounded-full shadow-lg hover:bg-indigo-700 transition transform hover:scale-110"
-      >
-        <span className="text-2xl">+</span>
-      </Link>
+      {/* FAB */}
+      <div className="fixed bottom-8 right-8 z-40">
+        <Button
+          asChild
+          size="lg"
+          className="h-14 w-14 rounded-full shadow-lg hover:shadow-primary/25 transition-transform hover:scale-105"
+        >
+          <Link href="/dashboard/create-blog">
+            <Plus className="h-8 w-8" />
+            <span className="sr-only">Create New Post</span>
+          </Link>
+        </Button>
+      </div>
     </div>
   );
 }
