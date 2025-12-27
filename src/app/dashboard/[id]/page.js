@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
 import { formatTimeAgo } from "../../utils/formatTime";
 import { Button } from "@/components/ui/button";
@@ -84,7 +85,8 @@ export default function BlogPostPage() {
   let overallLoading = postLoading || userLoading;
 
   const handleBack = () => {
-    router.push("/dashboard");
+    // router.push("/dashboard");
+    router.back();
   };
 
   const handleCommentSubmit = async (e) => {
@@ -162,7 +164,7 @@ export default function BlogPostPage() {
         {/* header */}
         <div className="flex items-center">
           <Button variant="ghost" className="gap-2" onClick={handleBack}>
-            <ArrowLeft className="h-4 w-4" /> Back to Dashboard
+            <ArrowLeft className="h-4 w-4" /> Back
           </Button>
         </div>
 
@@ -182,7 +184,12 @@ export default function BlogPostPage() {
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-muted-foreground text-sm">
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
-                  <span className="font-medium text-foreground">{post.Blogger.name}</span>
+                  <Link
+                    href={post.Blogger.username === loggedInUser?.username ? "/profile" : `/profile/${post.Blogger.username}`}
+                    className="font-medium text-foreground hover:underline hover:text-primary transition-colors"
+                  >
+                    {post.Blogger.name}
+                  </Link>
                 </div>
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
@@ -246,7 +253,16 @@ export default function BlogPostPage() {
                               </AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="text-sm font-semibold">{comment.Blogger?.name || "Anonymous"}</p>
+                              <p className="text-sm font-semibold">
+                                {comment.Blogger ? (
+                                  <Link
+                                    href={comment.Blogger.username === loggedInUser?.username ? "/profile" : `/profile/${comment.Blogger.username}`}
+                                    className="hover:underline hover:text-primary transition-colors"
+                                  >
+                                    {comment.Blogger.name}
+                                  </Link>
+                                ) : "Anonymous"}
+                              </p>
                               <p className="text-xs text-muted-foreground">{formatTimeAgo(comment.createdAt)}</p>
                             </div>
                           </div>

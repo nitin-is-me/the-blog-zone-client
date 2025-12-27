@@ -55,6 +55,7 @@ You can search through public/private posts with either "Title", "Content" or "A
 |3.1      | **19-Nov-2025** | Added password recovery instructions in the login page (it looks a bit cluttered but it was necessary). |
 |3.2      | **23-Dec-2025** | Edited description and added google-site-verification code (hoping my site appears under google results lol). |
 |3.3      | **27-Dec-2025** | BIG UPDATE: changed UI by implementing shadcn/ui components to refine the site. I have kept the old ui in the 'old-ui' branch of this repository. You can check changed.md file for the changes made. |
+|3.4      | **27-Dec-2025** | Added profile section for users to see their (and other users) posts and comments. |
 
 --------------
 ### Contribute to the project

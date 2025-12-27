@@ -27,9 +27,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ModeToggle } from "@/components/mode-toggle";
-import { ArrowLeft, LogOut, Eye, EyeOff, Loader2, User, Shield } from "lucide-react";
+import { ArrowLeft, LogOut, Eye, EyeOff, Loader2, User, Shield, FileText, MessageSquare, Calendar, Settings } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -39,12 +39,17 @@ export default function Profile() {
   const [updating, setUpdating] = useState(false);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(""); // i'm keeping this for local state but toast is better
-  const [activeTab, setActiveTab] = useState("personal");
+  const [success, setSuccess] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [usernameError, setUsernameError] = useState("");
+
+  // new state for tabs
+  const [myPosts, setMyPosts] = useState([]);
+  const [myComments, setMyComments] = useState([]);
+  const [contentLoading, setContentLoading] = useState(true);
+
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -64,23 +69,66 @@ export default function Profile() {
         return;
       }
 
+      setLoading(true);
+
       try {
-        const response = await axios.get("https://the-blog-zone-server.vercel.app/api/auth/me", {
+        // fetching user data
+        const userResponse = await axios.get("https://the-blog-zone-server.vercel.app/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        setCurrentUser(response.data);
+        const userData = userResponse.data;
+        setCurrentUser(userData);
         setFormData({
-          name: response.data.name || "",
-          username: response.data.username || "",
-          newUsername: response.data.username || "",
+          name: userData.name || "",
+          username: userData.username || "",
+          newUsername: userData.username || "",
           newPassword: "",
           confirmPassword: "",
           currentPassword: ""
         });
+
+        // fetching all posts to filter my content cuz i haven't created an endpoint for it yet
+        setContentLoading(true);
+        const postsResponse = await axios.get("https://the-blog-zone-server.vercel.app/api/blog");
+        const allPosts = postsResponse.data;
+
+        // filter my posts (deduplicated)
+        const seenPostIds = new Set();
+        const filteredPosts = [];
+
+        allPosts.forEach(post => {
+          if (post.Blogger.username === userData.username && !seenPostIds.has(post.id)) {
+            filteredPosts.push(post);
+            seenPostIds.add(post.id);
+          }
+        });
+
+        // Filter My Comments (deduplicated)
+        const seenCommentIds = new Set();
+        const filteredComments = [];
+
+        allPosts.forEach(post => {
+          if (post.Comments && post.Comments.length > 0) {
+            post.Comments.forEach(comment => {
+              if (comment.Blogger.username === userData.username && !seenCommentIds.has(comment.id)) {
+                filteredComments.push({
+                  ...comment,
+                  postTitle: post.title,
+                  postId: post.id
+                });
+                seenCommentIds.add(comment.id);
+              }
+            });
+          }
+        });
+
+        setMyPosts(filteredPosts);
+        setMyComments(filteredComments);
+
       } catch (error) {
-        console.error("Failed to fetch user info:", error);
-        toast.error("Failed to load user information.");
+        console.error("Failed to fetch user info or content:", error);
+        toast.error("Failed to load profile information.");
 
         if (error.response?.status === 401) {
           localStorage.removeItem("token");
@@ -88,6 +136,7 @@ export default function Profile() {
         }
       } finally {
         setLoading(false);
+        setContentLoading(false);
       }
     };
 
@@ -95,8 +144,6 @@ export default function Profile() {
   }, [router]);
 
   const handleLogout = async () => {
-
-
     setLogoutLoading(true);
     localStorage.removeItem("token");
     toast.success("Logged out successfully");
@@ -128,10 +175,6 @@ export default function Profile() {
   const handlePasswordChange = (e) => {
     const { name, value } = e.target;
 
-    // We need to use the new value for the field being changed
-    // and the current state for the other field to compare effectively
-    // but setFormData is async so we use local variables for validation
-
     setFormData((prev) => ({
       ...prev,
       [name]: value
@@ -151,7 +194,6 @@ export default function Profile() {
       currentConfirmPassword = value;
     }
 
-    // Only validate matching if both fields have some content or if we are typing in the second field
     if (currentNewPassword && currentConfirmPassword) {
       if (currentNewPassword !== currentConfirmPassword) {
         setPasswordError("Passwords do not match");
@@ -312,7 +354,7 @@ export default function Profile() {
                 <ArrowLeft className="h-5 w-5" />
               </Link>
             </Button>
-            <h1 className="text-xl font-bold">Settings</h1>
+            <h1 className="text-xl font-bold">My Profile</h1>
           </div>
           <div className="flex items-center gap-2">
             <ModeToggle />
@@ -345,9 +387,7 @@ export default function Profile() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-4xl mx-auto w-full p-6 space-y-8">
-        {/* User Profile Banner */}
+      <main className="flex-1 max-w-4xl mx-auto w-full p-4 sm:p-6 space-y-8">
         <Card className="border-none shadow-md bg-card/50">
           <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
             <Avatar className="h-24 w-24 border-2 border-primary/20">
@@ -359,151 +399,243 @@ export default function Profile() {
               <h2 className="text-2xl font-bold">{currentUser?.name}</h2>
               <p className="text-muted-foreground">@{currentUser?.username}</p>
               <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 mt-2">
-                Joined {formatTimeAgo(currentUser.createdAt).split(",")[0].trim()}
+                Joined {formatTimeAgo(currentUser?.createdAt || "").split(",")[0].trim()}
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Settings Tabs */}
-        <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 lg:w-[400px] mb-8">
-            <TabsTrigger value="personal" className="gap-2">
-              <User className="h-4 w-4" /> Personal
+
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 lg:w-[450px] mb-8">
+            <TabsTrigger value="posts" className="gap-2">
+              <FileText className="h-4 w-4" /> Posts
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
-              <Shield className="h-4 w-4" /> Security
+            <TabsTrigger value="comments" className="gap-2">
+              <MessageSquare className="h-4 w-4" /> Comments
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="h-4 w-4" /> Settings
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="personal">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Information</CardTitle>
-                <CardDescription>
-                  Update your public profile display name and username.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <form id="personal-form" onSubmit={updateProfile} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Display Name</Label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="Your name"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="newUsername">Username</Label>
-                    <Input
-                      id="newUsername"
-                      name="newUsername"
-                      value={formData.newUsername}
-                      onChange={handleUsernameChange}
-                      placeholder="username"
-                      required
-                      className={usernameError ? "border-destructive" : ""}
-                    />
-                    {usernameError && (
-                      <p className="text-xs text-destructive">{usernameError}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      Current username: {currentUser?.username}
-                    </p>
-                  </div>
-                </form>
-              </CardContent>
-              <CardFooter className="flex justify-end border-t p-6">
-                <Button
-                  type="submit"
-                  form="personal-form"
-                  disabled={updating || !!usernameError}
+          <TabsContent value="posts" className="space-y-4">
+            {contentLoading ? (
+              <div className="text-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <p className="mt-2 text-muted-foreground">Loading posts...</p>
+              </div>
+            ) : myPosts.length > 0 ? (
+              myPosts.map(post => (
+                <Card
+                  key={post.id}
+                  className="hover:border-primary/50 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/dashboard/${post.id}`)}
                 >
-                  {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
-              </CardFooter>
-            </Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg hover:underline decoration-primary/50 underline-offset-4">
+                      {post.title}
+                    </CardTitle>
+                    <div className="text-sm text-muted-foreground flex items-center gap-2">
+                      <Calendar className="h-3 w-3" />
+                      {formatTimeAgo(post.createdAt)}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground line-clamp-2 text-sm">
+                      {post.content}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
+                You haven't written any posts yet.
+                <div className="mt-4">
+                  <Button asChild variant="outline">
+                    <Link href="/dashboard/create-blog">Create your first post</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
-          <TabsContent value="security">
-            <Card>
-              <CardHeader>
-                <CardTitle>Security Settings</CardTitle>
-                <CardDescription>
-                  Manage your password and account security.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <form id="security-form" onSubmit={updatePassword} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <div className="relative">
-                      <Input
-                        type={showNewPassword ? "text" : "password"}
-                        id="newPassword"
-                        name="newPassword"
-                        value={formData.newPassword}
-                        onChange={handlePasswordChange}
-                        required
-                        className="pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={toggleNewPasswordVisibility}
-                      >
-                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Input
-                        type={showConfirmPassword ? "text" : "password"}
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        value={formData.confirmPassword}
-                        onChange={handlePasswordChange}
-                        required
-                        className="pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={toggleConfirmPasswordVisibility}
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                    {passwordError && (
-                      <p className="text-xs text-destructive">{passwordError}</p>
-                    )}
-                  </div>
-                </form>
-              </CardContent>
-              <CardFooter className="flex justify-end border-t p-6">
-                <Button
-                  type="submit"
-                  form="security-form"
-                  disabled={updating || !!passwordError || !formData.newPassword}
+          <TabsContent value="comments" className="space-y-4">
+            {contentLoading ? (
+              <div className="text-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+                <p className="mt-2 text-muted-foreground">Loading comments...</p>
+              </div>
+            ) : myComments.length > 0 ? (
+              myComments.map((comment, index) => (
+                <Card
+                  key={`${comment.id}-${index}`}
+                  className="hover:bg-muted/30 transition-colors cursor-pointer"
+                  onClick={() => router.push(`/dashboard/${comment.postId}`)}
                 >
-                  {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Update Password
-                </Button>
-              </CardFooter>
-            </Card>
+                  <CardHeader className="pb-2">
+                    <div className="text-sm text-muted-foreground">
+                      Commented on <span className="font-medium text-primary hover:underline">{comment.postTitle}</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-foreground/90 text-sm">"{comment.content}"</p>
+                    <div className="text-xs text-muted-foreground mt-2">
+                      {formatTimeAgo(comment.createdAt)}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-lg">
+                You haven't made any comments yet.
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="settings" className="space-y-6">
+
+
+            <Tabs defaultValue="personal" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="personal" className="gap-2">
+                  <User className="h-4 w-4" /> Info
+                </TabsTrigger>
+                <TabsTrigger value="security" className="gap-2">
+                  <Shield className="h-4 w-4" /> Password
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="personal">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Personal Information</CardTitle>
+                    <CardDescription>
+                      Update your public profile display name and username.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <form id="personal-form" onSubmit={updateProfile} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Display Name</Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          placeholder="Your name"
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="newUsername">Username</Label>
+                        <Input
+                          id="newUsername"
+                          name="newUsername"
+                          value={formData.newUsername}
+                          onChange={handleUsernameChange}
+                          placeholder="username"
+                          required
+                          className={usernameError ? "border-destructive" : ""}
+                        />
+                        {usernameError && (
+                          <p className="text-xs text-destructive">{usernameError}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Current username: {currentUser?.username}
+                        </p>
+                      </div>
+                    </form>
+                  </CardContent>
+                  <CardFooter className="flex justify-end border-t p-6">
+                    <Button
+                      type="submit"
+                      form="personal-form"
+                      disabled={updating || !!usernameError}
+                    >
+                      {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Save Changes
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="security">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Security Settings</CardTitle>
+                    <CardDescription>
+                      Manage your password.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <form id="security-form" onSubmit={updatePassword} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="newPassword">New Password</Label>
+                        <div className="relative">
+                          <Input
+                            type={showNewPassword ? "text" : "password"}
+                            id="newPassword"
+                            name="newPassword"
+                            value={formData.newPassword}
+                            onChange={handlePasswordChange}
+                            required
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={toggleNewPasswordVisibility}
+                          >
+                            {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            value={formData.confirmPassword}
+                            onChange={handlePasswordChange}
+                            required
+                            className="pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={toggleConfirmPasswordVisibility}
+                          >
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                        {passwordError && (
+                          <p className="text-xs text-destructive">{passwordError}</p>
+                        )}
+                      </div>
+                    </form>
+                  </CardContent>
+                  <CardFooter className="flex justify-end border-t p-6">
+                    <Button
+                      type="submit"
+                      form="security-form"
+                      disabled={updating || !!passwordError || !formData.newPassword}
+                    >
+                      {updating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Update Password
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </main>

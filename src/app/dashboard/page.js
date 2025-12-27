@@ -268,7 +268,11 @@ export default function Dashboard() {
         {filteredPosts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPosts.map((post) => (
-              <Card key={post.id} className="group relative flex flex-col overflow-hidden border-muted transition-all hover:shadow-xl hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+              <Card
+                key={post.id}
+                className="group relative flex flex-col overflow-hidden border-muted transition-all hover:shadow-xl hover:border-primary/20 bg-card/50 backdrop-blur-sm cursor-pointer"
+                onClick={() => router.push(`/dashboard/${post.id}`)}
+              >
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start gap-4">
                     <CardTitle className="text-xl font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
@@ -276,7 +280,13 @@ export default function Dashboard() {
                     </CardTitle>
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground mt-2">
-                    <span className="font-medium text-foreground mr-2">{post.Blogger.name}</span>
+                    <Link
+                      href={post.Blogger.username === currentUser?.username ? "/profile" : `/profile/${post.Blogger.username}`}
+                      className="font-medium text-foreground mr-2 hover:underline hover:text-primary transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {post.Blogger.name}
+                    </Link>
                     <span>• {formatTimeAgo(post.createdAt)}</span>
                   </div>
                 </CardHeader>
@@ -285,45 +295,47 @@ export default function Dashboard() {
                     {post.content}
                   </p>
                 </CardContent>
-                <CardFooter className="pt-0 flex items-center justify-between border-t bg-muted/10 p-4">
-                  <Button variant="default" size="sm" asChild className="rounded-full px-4 bg-purple-800 hover:bg-purple-900 text-white">
-                    <Link href={`/dashboard/${post.id}`}>
-                      Read Article
-                    </Link>
-                  </Button>
 
-                  {currentUser?.username === post.Blogger.username && (
-                    <div className="flex gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}>
-                        Edit
-                      </Button>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-600 hover:bg-destructive/10"
-                            disabled={deletingPostId === post.id}
-                          >
-                            {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete your post.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(post.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  )}
-                </CardFooter>
+                {currentUser?.username === post.Blogger.username && (
+                  <CardFooter className="pt-0 flex items-center justify-between border-t bg-muted/10 p-4 mt-auto">
+
+                    <Button variant="ghost" size="sm" onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/dashboard/edit-blog/${post.id}`);
+                    }}>
+                      Edit
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-600 hover:bg-destructive/10"
+                          disabled={deletingPostId === post.id}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete your post.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(post.id);
+                          }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+
+                  </CardFooter>
+                )}
               </Card>
             ))}
           </div>

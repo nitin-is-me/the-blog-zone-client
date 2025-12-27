@@ -251,9 +251,13 @@ export default function PrivatePosts() {
             </div>
           ) : (
             filteredPosts.map((post) => (
-              <Card key={post.id} className="flex flex-col overflow-hidden border-muted hover:shadow-lg transition-all hover:border-primary/20 bg-card/50 backdrop-blur-sm">
+              <Card
+                key={post.id}
+                className="flex flex-col overflow-hidden border-muted hover:shadow-lg transition-all hover:border-primary/20 bg-card/50 backdrop-blur-sm cursor-pointer group"
+                onClick={() => router.push(`/dashboard/private/${post.id}`)}
+              >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-xl font-bold line-clamp-2 leading-tight">
+                  <CardTitle className="text-xl font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
                     {post.title}
                   </CardTitle>
                   <div className="flex items-center text-xs text-muted-foreground mt-2">
@@ -266,20 +270,18 @@ export default function PrivatePosts() {
                     {post.content}
                   </p>
                 </CardContent>
-                <CardFooter className="pt-0 flex justify-between items-center bg-muted/20 px-6 py-4 mt-auto">
-                  <Button variant="default" size="sm" asChild className="rounded-full px-4 bg-purple-800 hover:bg-purple-900 text-white">
-                    <Link href={`/dashboard/${post.id}`}>
-                      Read Article
-                    </Link>
-                  </Button>
 
+                <CardFooter className="pt-0 flex justify-between items-center bg-muted/20 px-6 py-4 mt-auto">
                   {currentUser?.username === post.Blogger.username && (
-                    <div className="flex items-center gap-2">
+                    <>
                       <Button
                         variant="ghost"
                         size="sm"
-                        // className="h-8 px-2 text-muted-foreground hover:text-foreground"
-                        onClick={() => router.push(`/dashboard/edit-blog/${post.id}`)}
+                        className="pl-0 hover:bg-transparent hover:text-primary transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/dashboard/edit-blog/${post.id}`);
+                        }}
                       >
                         Edit
                       </Button>
@@ -290,11 +292,12 @@ export default function PrivatePosts() {
                             size="sm"
                             className="text-red-500 hover:text-red-600 hover:bg-destructive/10"
                             disabled={deletingPostId === post.id}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {deletingPostId === post.id ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent className="sm:max-w-[425px]">
+                        <AlertDialogContent onClick={(e) => e.stopPropagation()}>
                           <AlertDialogHeader>
                             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                             <AlertDialogDescription>
@@ -302,12 +305,15 @@ export default function PrivatePosts() {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(post.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
+                            <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(post.id);
+                            }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Delete</AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
                       </AlertDialog>
-                    </div>
+                    </>
                   )}
                 </CardFooter>
               </Card>
